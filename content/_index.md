@@ -6,3 +6,4 @@ menu:
         params:
             icon: home
 ---
+# Welcome to the My Blog

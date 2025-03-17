@@ -5,7 +5,7 @@ rssFullContent = true
 favicon = "/favicon.png"
 
 [footer]
-since = 2020
+since = 2025
 customText = ""
 
 [dateFormat]
@@ -23,7 +23,7 @@ src = "img/avt.jpg"
 
 [article]
 headingAnchor = false
-math = false
+math = true
 readingTime = true
 
 [article.license]
