@@ -6,7 +6,7 @@ weight: 1
 description: "This is a series of posts about the RWKV architecture"
 image: "image.png"
 categories:
-    - "linear attention"
+    - "Research"
 tags:
     - "RWKV"
     - "RNN"

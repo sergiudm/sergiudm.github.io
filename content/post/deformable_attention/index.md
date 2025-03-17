@@ -4,7 +4,7 @@ date: 2025-03-17 00:00:00+0000
 slug: "deformable attention"
 image: "image.png"
 categories: 
-    - "Visual Representation Learning"
+    - "Research"
 tags:
     - "Deformable Attention"
     - "Attention Mechanism"
