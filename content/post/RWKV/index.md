@@ -1,9 +1,9 @@
 ---
-title: "RWKV"
-date: 2025-03-17 00:00:00+0000
+title: "The Evolution of RWKV"
+date: 2025-04-4 21:00:00+0000
 slug: "RWKV"
 weight: 1
-description: "This is a series of posts about the RWKV architecture"
+description: "This is a series of posts about the RWKV architecture(From v4 to v7)"
 image: "image.png"
 categories:
     - "Research"
