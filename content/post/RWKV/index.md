@@ -20,9 +20,11 @@ Before we dive into the RWKV architecture, let's first review the traditional so
 The attention mechanism allows the model to focus on different parts of the input sequence when making predictions. It computes a weighted sum of the input tokens, where the weights are determined by the similarity between the query and key vectors.
 
 Given a sequence of $n$ tokens $\mathbf{x} = \begin{bmatrix} \mathbf{x}_1 \\ \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_n \end{bmatrix} \in \mathbb{R}^{n \times d}$, the (non-causal) attention output can be expressed as:
+
 $$
 \text{Attn}(t) = \sum_{i=1}^n \alpha(i,t)\mathbf{v}_i=\sum_{i=1}^{n} \frac{\text{sim}(\mathbf{q_t, k_i})}{\sum_{j=1}^{n} \text{sim}(\mathbf{q_t, k_j})} \mathbf{v}_i=\sum_{i=1}^{n} \frac{\exp(\mathbf{q_t k_i^T})}{\sum_{j=1}^{n} \exp(\mathbf{q_t k_j^T})} \mathbf{v}_i \in \mathbb{R}^{d}
 $$
+
 where $\mathbf{q}_t$, $\mathbf{k}_i$, and $\mathbf{v}_i$ are the query, key, and value vectors for the $t$-th token and the $i$-th token, respectively. The attention weights $\alpha(i,t)$ are computed using the softmax function, which normalizes the scores to sum to 1.
 
 ## Conputation cost
@@ -30,12 +32,15 @@ It is easy to see that the attention computation has a time complexity of $O(n^2
 
 # RNNs
 Unlike the attention mechanism, RNNs process sequences of tokens **one at a time**, maintaining a hidden state that is updated at each time step. The hidden state is computed using the previous hidden state and the current input token. The RNN can be expressed as:
+
 $$
 \mathbf{h}_t = f(\mathbf{h}_{t-1} \mathbf{W}_{h} + \mathbf{x}_t \mathbf{W}_x+ \mathbf{b}_h)
 $$
+
 $$
 \mathbf{y}_t = g(\mathbf{h}_t \mathbf{W}_y + \mathbf{b}_y)
 $$
+
 where $\mathbf{h}_t$ is the hidden state at time step $t$, and $\mathbf{y}_t$ is the output at time step $t$. The function $f$ (and $g$) is typically a non-linear activation function. The matrices $\mathbf{W}_h$, $\mathbf{W}_x$, and $\mathbf{W}_y$ are the weight matrices for the hidden state, input, and output, respectively, and $\mathbf{b}$ and $\mathbf{b}_y$ are the bias vectors.
 
 ## Computation cost
