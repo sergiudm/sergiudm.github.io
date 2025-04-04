@@ -1,7 +1,7 @@
 ---
-title: "RWKV"
+title: "The Evolution of RWKV(part 1)"
 slug: "RWKV"
-date: 2025-04-04 21:00:00+0000
+date: 2025-04-03 21:00:00+0000
 weight: 1
 description: "This is a series of posts about the RWKV architecture(From v4 to v7)"
 image: "image.png"
@@ -11,8 +11,8 @@ tags:
     - "RWKV"
     - "RNN"
     - "linear attention"
-
 ---
+
 # Overview
 This is a series of posts about the RWKV architecture. The RWKV architecture is a novel neural network architecture that combines the strengths of recurrent neural networks (RNNs) and linear attention mechanisms. In this series, I will explore the design and implementation of the RWKV architecture, and during the journey, I will also discuss the relationship between the RWKV architecture and other popular neural network architectures, such as [GLA](https://arxiv.org/abs/2312.06635) and [DeltaNet](https://arxiv.org/abs/2406.06484).
 
