@@ -1,5 +1,5 @@
 ---
-title: "The Evolution of RWKV"
+title: "The Evolution of RWKV(part 1)"
 date: 2025-04-4 21:00:00+0000
 slug: "RWKV"
 weight: 1
@@ -14,15 +14,27 @@ tags:
 
 ---
 # Overview
-This is a series of posts about the RWKV architecture. The RWKV architecture is a novel neural network architecture that combines the strengths of recurrent neural networks (RNNs) and linear attention mechanisms. In this series, I will explore the design and implementation of the RWKV architecture, as well as its applications in natural language processing and other domains.
+This is a series of posts about the RWKV architecture. The RWKV architecture is a novel neural network architecture that combines the strengths of recurrent neural networks (RNNs) and linear attention mechanisms. In this series, I will explore the design and implementation of the RWKV architecture, and during the journey, I will also discuss the relationship between the RWKV architecture and other popular neural network architectures, such as [GLA](https://arxiv.org/abs/2312.06635) and [DeltaNet](https://arxiv.org/abs/2406.06484).
 
-# Before we go: traditional dot-product attention
-Talk is cheap, show me the formula. Here is the formula for the dot-product attention mechanism:
+# Before we go: traditional softmax attention
+Before we dive into the RWKV architecture, let's first review the traditional softmax attention mechanism, which is a key component of many modern neural network architectures, including transformers.
+The attention mechanism allows the model to focus on different parts of the input sequence when making predictions. It computes a weighted sum of the input tokens, where the weights are determined by the similarity between the query and key vectors.
+
+Given a sequence of $n$ tokens $\mathbf{x} = \begin{bmatrix} \mathbf{x}_1 \\ \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_n \end{bmatrix} \in \mathbb{R}^{n \times d}$, the (non-causal) attention output can be expressed as:
 $$
-\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\text{Attention}(\mathbf{x}_t) = \sum_{i=1}^n \alpha(i,t)\mathbf{v}_i=\sum_{i=1}^{n} \frac{\text{sim}(\mathbf{q_t, k_i})}{\sum_{j=1}^{n} \text{sim}(\mathbf{q_t, k_j})} \mathbf{v}_i=\sum_{i=1}^{n} \frac{\exp(\mathbf{q_t^T k_i})}{\sum_{j=1}^{n} \exp(\mathbf{q_t^T k_j})} \mathbf{v}_i
 $$
+where $\mathbf{q}_t$, $\mathbf{k}_i$, and $\mathbf{v}_i$ are the query, key, and value vectors for the $t$-th token and the $i$-th token, respectively. The attention weights $\alpha(i,t)$ are computed using the softmax function, which normalizes the scores to sum to 1.
 
-# First Step: AFT
-The first step in the RWKV architecture is the attention-free transformer (AFT) layer. The AFT layer is a novel type of transformer layer that does not use attention mechanisms to compute the interactions between tokens in a sequence. Instead, the AFT layer uses a set of learnable parameters to compute the interactions between tokens in a sequence, which allows it to capture long-range dependencies more efficiently than traditional attention mechanisms.
+## Conputation cost
+It is easy to see that the attention computation has a time complexity of $O(n^2)$, since for each token $t$, we need to compute the attention weights for **all** $n$ tokens. This can be a bottleneck for long sequences, as the computation time increases quadratically with the sequence length. (during inference, the cost is still $O(n^2)$ even if you apply the cache mechanism to speed up the computation.)
 
-# RWKV v1
+# RNNs
+Unlike the attention mechanism, RNNs process sequences of tokens **one at a time**, maintaining a hidden state that is updated at each time step. The hidden state is computed using the previous hidden state and the current input token. The RNN can be expressed as:
+$$
+\mathbf{h}_t = f(\mathbf{W}_h \mathbf{h}_{t-1} + \mathbf{W}_x \mathbf{x}_t + \mathbf{b})
+$$
+$$
+\mathbf{y}_t = \mathbf{W}_y \mathbf{h}_t + \mathbf{b}_y
+$$
+where $\mathbf{h}_t$ is the hidden state at time step $t$, and $\mathbf{y}_t$ is the output at time step $t$. The function $f$ is typically a non-linear activation function, such as the hyperbolic tangent (tanh) or the rectified linear unit (ReLU). The matrices $\mathbf{W}_h$, $\mathbf{W}_x$, and $\mathbf{W}_y$ are the weight matrices for the hidden state, input, and output, respectively, and $\mathbf{b}$ and $\mathbf{b}_y$ are the bias vectors.
