@@ -1,6 +1,6 @@
 ---
 title: "CUDALearnNext: A CUDA Learning Path in 20s"
-date: 2025-04-2 09:00:00+0000
+date: 2025-04-02 09:00:00+0000
 slug: "cuda_learning"
 image: "image.png"
 categories: 
