@@ -6,9 +6,9 @@ draft: false
 weight: 1
 description: "Introduce RWKV v5 and v6."
 tags: 
-    -"RWKV"
-    -"lienar attention"
-    -"RNN"
+    - "RWKV"
+    - "lienar attention"
+    - "RNN"
 image: "image.png"
 categories: ["Research"]
 ---
