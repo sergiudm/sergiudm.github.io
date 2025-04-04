@@ -1,5 +1,5 @@
 ---
-title: "Understanding RWKV v4"
+title: "The Evolution of RWKV(part 2)"
 date: 2025-04-04 00:00:00+0000
 slug: "RWKV"
 draft: false
@@ -71,7 +71,7 @@ $$
 &= \sum_{i=1}^{t} \mathbf{q}_t \mathbf{k}_i^T \mathbf{v}_i
 \end{align*}
 $$
-This is the attention output!
+This is the attention output (linear combination of value vectors)!
 
 ## So what?
 What an exciting result! It allows us to train our models in "attention" mode, and then switch to "RNN" mode for inference. But wait, there's more! Take a look at the "attention" formula:
