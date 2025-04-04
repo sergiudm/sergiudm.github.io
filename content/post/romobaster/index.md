@@ -6,9 +6,9 @@ date: 2025-03-17 00:00:00+0000
 image: "image.png"
 categories:
     - "Robomaster"
+weight: 2
 tags:
     - "Robotics"
-    - "Autonomous Systems"
     - "Navigation Systems"
 
 ---
