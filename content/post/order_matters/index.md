@@ -1,6 +1,6 @@
 ---
 title: "Order Matters"
-date: 2025-04-3 18:00:00+0000
+date: 2025-04-03 18:00:00+0000
 image: "image.png"
 categories: 
     - "Counterintuitive Deep Learning"
