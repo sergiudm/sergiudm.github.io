@@ -1,7 +1,6 @@
 ---
 title: "The Evolution of RWKV(part 2)"
-date: 2025-04-04 00:00:00+0000
-slug: "RWKV"
+date: 2025-04-04 03:00:00+0000
 draft: false
 weight: 1
 description: "A deep dive into the RWKV v4 architecture."
@@ -117,4 +116,6 @@ where $w_{t,j} \in \mathbb{R}$ is the learnable position bias for the $j$-th tok
 Note that the AFT-Full architecture cannot be unfolded into a RNN, since the position bias $w_{t,j}$ is not independent of $t$. And the computation cost is still $O(n)^2$.
 
 # RWKV v4
-Finally, we are ready to see the RWKV v4 architecture. The RWKV v4 architecture starts with the AFT-Full architecture, 
+Finally, we are ready to see the RWKV v4 architecture. The RWKV v4 architecture looks similar to AFT-Full, but with a few key differences:
+
+1. The position bias $w_{t,j}$ is replaced with a learnable "pair-wise position bias" $\mathbf{w}_{t,j} \in \mathbb{R}^{d}$, which is a vector instead of a scalar. This allows the model to learn more complex relationships between the tokens in the sequence.
