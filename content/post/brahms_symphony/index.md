@@ -2,7 +2,7 @@
 title: "勃四广交之行"
 date: 2025-03-29 09:00:00+0000
 categories: 
-    - "Music"
+    - "music"
 language: "zh"
 tags:
     - "Symphony"
