@@ -279,7 +279,7 @@ $$
 Token shift tell the model how to treat new tokens by interpolating between the current and previous token representations. In essence, it can be viewed as a convolution with kernel size 2 (The FFN block in the transformer architecture can be viewed as a convolution with kernel size 1), which enhances the model's ability to capture local patterns in the sequence.
 
 > Note:
-> [Mamba](https://arxiv.org/abs/2312.00752) also proposed a similar idea, i.e., "causal conv1d", applied to the input embedding before the Mamba block.
+> [Mamba](https://arxiv.org/abs/2312.00752) also proposed a similar idea, i.e., "causal conv1d", applied to the input embedding before the SSM block.
 
 ## Overall architecture
 The overall architecture of RWKV v4 is shown below:
