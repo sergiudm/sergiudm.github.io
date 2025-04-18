@@ -1,7 +1,7 @@
 ---
 title: "The Evolution of RWKV(part 3)"
 date: 2025-04-14 00:00:00+0000
-draft: false
+draft: true
 weight: 1
 description: "Introduce RWKV v5 and v6."
 tags: 
