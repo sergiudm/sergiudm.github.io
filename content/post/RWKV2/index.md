@@ -25,13 +25,13 @@ Now, let's see something interesting:
 ### attention -> RNN
 Let's start with the softmax attention mechanism:
 $$
-\text{Attn}(t)=\sum_{i=1}^{n} \frac{\exp(\mathbf{q_t k_i^T})}{\sum_{j=1}^{n} \exp(\mathbf{q_t k_j^T})} \mathbf{v}_i
+\text{Attn}(t)=\sum_{i=1}^{n} \frac{\exp(\mathbf{q_t k_i^T})}{\sum_{j=1}^{n} \exp(\mathbf{q_t k_j^T})} \mathbf{v}_i = \text{softmax}(\mathbf{q}_t \mathbf{K}^T)\mathbf{V}
 $$
 
 Without the softmax, we have:
 
 $$
-\text{Attn}(t)=\sum_{i=1}^{n} \frac{\mathbf{q_t k_i^T}}{\sum_{j=1}^{n} \mathbf{q_t k_j^T}} \mathbf{v}_i
+\text{'Attn'}(t)=\sum_{i=1}^{n} \frac{\mathbf{q_t k_i^T}}{\sum_{j=1}^{n} \mathbf{q_t k_j^T}} \mathbf{v}_i
 =\frac{\mathbf{q}_t\sum_{i=1}^{n}\mathbf{k}_i^T\mathbf{v}_i}{\mathbf{q}_t\sum_{j=1}^{n} \mathbf{k}_j^T}
 $$
 
