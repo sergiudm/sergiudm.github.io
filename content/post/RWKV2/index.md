@@ -27,15 +27,18 @@ Let's start with the softmax attention mechanism:
 $$
 \text{Attn}(t)=\sum_{i=1}^{n} \frac{\exp(\mathbf{q_t k_i^T})}{\sum_{j=1}^{n} \exp(\mathbf{q_t k_j^T})} \mathbf{v}_i = \text{softmax}(\mathbf{q}_t \mathbf{K}^T)\mathbf{V}
 $$
+(for simplicity, we omit the scalar $d_k$ in the attention formula)
 
-Without the softmax, we have:
+Without `softmax`, we have:
 
 $$
 \text{'Attn'}(t)=\sum_{i=1}^{n} \frac{\mathbf{q_t k_i^T}}{\sum_{j=1}^{n} \mathbf{q_t k_j^T}} \mathbf{v}_i
 =\frac{\mathbf{q}_t\sum_{i=1}^{n}\mathbf{k}_i^T\mathbf{v}_i}{\mathbf{q}_t\sum_{j=1}^{n} \mathbf{k}_j^T}
 $$
 
-Let $\mathbf{S}_t=\sum_{i=1}^{n-1}\mathbf{k}_i^T\mathbf{v}_i$ and $\mathbf{Z}_t=\sum_{j=1}^{n-1} \mathbf{k}_j^T$, we have:
+Let 
+$$\mathbf{S}_t=\sum_{i=1}^{n-1}\mathbf{k}_i^T\mathbf{v}_i$$ and 
+$$\mathbf{Z}_t=\sum_{j=1}^{n-1} \mathbf{k}_j^T$$, we have:
 
 $$
 \begin{align*}
@@ -90,12 +93,12 @@ What an exciting result! It allows us to train our models in "attention" mode, a
 
 $$
 \text{Attn}(t)
-=\frac{\mathbf{q}_t\sum_{i=1}^{n}\mathbf{k}_i^T\mathbf{v}_i}{\mathbf{q}_t\sum_{j=1}^{n} \mathbf{k}_j^T}
+=\frac{\mathbf{q}_t\sum_{i=1}^{n}\mathbf{k}_i^T\mathbf{v}_i}{\mathbf{q}_t\sum_{j=1}^{n} \mathbf{k}_j^T} = \frac{\mathbf{q}_t \mathbf{S}}{\mathbf{q}_t \mathbf{Z}}
 $$
 
-The term  $\sum_{i=1}^{n}\mathbf{k}_i^T\mathbf{v}_i$  and  $\sum_{j=1}^{n} \mathbf{k}_j^T$  are independent of the current token $t$. This means that we can pre-compute these terms and store them in a cache, allowing us to compute the attention output in $O(1)$ time at each time step. Therefore, the total computation cost for processing a sequence of length $n$ is $O(n)$, which is much more efficient than the traditional softmax attention mechanism.
+The terms  $$\mathbf{S}=\sum_{i=1}^{n}\mathbf{k}_i^T\mathbf{v}_i$$ and  $$\mathbf{Z}=\sum_{j=1}^{n} \mathbf{k}_j^T$$ are independent of $t$. Therefore we can pre-compute these terms and store them in a cache (in a sense of dynamic programming), allowing us to compute the attention output in $O(1)$ time at each time step. In this way, the total computation cost for processing a sequence of length $n$ is $O(n)$, which is much more efficient than the traditional `softmax` attention mechanism.
 
-> Another view of this is that when we drop the softmax, instead of computing $(\mathbf{Q}\mathbf{K}^T)\mathbf{V}$, which takes $O(n^2d)$ multiplications, we compute $\mathbf{Q}(\mathbf{K}^T\mathbf{V})$, which takes $O(nd^2)$ multiplications.
+> Another view of this is that when we drop the `softmax`, instead of computing $(\mathbf{Q}\mathbf{K}^T)\mathbf{V}$, which takes $O(n^2d)$ multiplications, we compute $\mathbf{Q}(\mathbf{K}^T\mathbf{V})$, which takes $O(nd^2)$ multiplications.
 
 >Spoiler: what if we have a causal mask? It's sad that we can no longer use the associativity of matrix multiplication with a causal mask. Therefore it's hard to parallelize the computation in time dimension. See the [next post](https://sergiudm.github.io/p/rwkv3/) for more details and a solution.
 
@@ -111,7 +114,7 @@ $$
 
 where $\sigma_q(\mathbf{q}_t)$ is a non-linear function(sigmoid as default) of the query vector $\mathbf{q}_t$, $\odot$ denotes element-wise multiplication, and the division is also element-wise.
 
-With the knowledge of linear attention, now we can see that the values of $\sum_{j=1}^{N}\exp(\mathbf{K}_j)\odot \mathbf{v}_j$ and $\sum_{j=1}^{N} \exp(\mathbf{K}_j) \in \mathbb{R}^d$ are independent of $t$, thus can be cached to save computation cost. Furthermore, all operations are element-wise, the hidden state reduces to a vector, and the computation cost is $O(n)$.
+With the knowledge of linear attention, now we can see that the values of $$\sum_{j=1}^{N}\exp(\mathbf{K}_j)\odot \mathbf{v}_j$$ and $$\sum_{j=1}^{N} \exp(\mathbf{K}_j) \in \mathbb{R}^d$$ are independent of $t$, thus can be cached to save computation cost. Furthermore, all operations are element-wise, the hidden state reduces to a vector, and the computation cost is $O(n)$.
 
 The RNN form of AFT-Simple is:
 
@@ -142,20 +145,20 @@ $$
 
 . Therefore $w_{t,j}$ acts like an input gate for the $j$-th token at $t$.
 
-![illustration of AFT](image-1.png)
+![illustration of AFT-Full](image-1.png)
 
 Note that the AFT-Full architecture cannot be unfolded into a RNN, since the position bias $w_{t,j}$ is not independent of $t$. And the computation cost is still $O(n^2)$.
 
 # RWKV v4
 Finally, we are ready to see the RWKV v4 architecture. The RWKV v4 architecture looks similar to AFT-Full, but with a few key differences:
 
-1. The position bias $w_{t,j}$ is replaced with a learnable "pair-wise position bias" $\mathbf{w}_{t,j} \in \mathbb{R}^{d}$, which is a vector instead of a scalar. This allows the model to learn more complex relationships between the tokens in the sequence.
+1. The position bias $w_{t,j}$ is replaced with a learnable "pair-wise position bias" $\mathbf{w}_{t,j} \in \mathbb{R}^{d}$, which is a vector instead of a scalar (each element is responsible for the entire sequence in a channel). 
 
-2. To "circumvent any potential degradation of $\mathbf{W}$", the RWKV v4 architecture uses another vector $\mathbf{u}$ to attend to the "current" tokens(while the "past" tokens are governed by $\mathbf{W}$). This design will be seen clearly in the WKV operation.
+2. To "circumvent any potential degradation of $\mathbf{W}$", the RWKV v4 architecture uses another vector $\mathbf{u}$ to attend to the "current" tokens (while the "past" tokens are governed by $\mathbf{W}$). This design will be seen clearly in the WKV operation.
 
-## WKV operation
-For coherence, I skipped some important innovations in the RWKV v4 architecture, such as the "token-shift" operation, we will see them after the illustration of the WKV operation.
-Now it's time to see the WKV operation, which is defined as:
+## The `WKV` operation
+For coherence, I skipped some important innovations in the RWKV v4 architecture, such as the "token-shift" operation; we will see them after the illustration of the `WKV` operation.
+Now it's time to see the (causal) `WKV` operation, which is defined as:
 
 $$
 {wkv}_t  = \frac{\sum_{j=1}^{t-1}e^{-(t-1-j)w+k_j}\odot {v}_j+e^{u+k_t}\odot {v}_t}{\sum_{j=1}^{t-1}e^{-(t-1-j)w+k_j}+e^{u+k_t}}
