@@ -186,6 +186,8 @@ b_t &= e^{-w}\odot b_{t-1} + e^{k_t} \\
 \end{align*}
 $$
 
+Now it's easier to see the role of the decay term: it allows the model to learn a "forgetting" mechanism, which is similar to the forget gate in LSTMs. The decay term $e^{-w}$ diminishes the influence of the "past" tokens as $t$ increases, allowing the model to focus more on the "current" token.
+
 ![RWKV time-mixing block](image-2.png)
 
 However, $e^{k_t}$ can be large, and the above equation may cause overflow. To avoid this, we use a trick to constrain the values of the two "coefficients" to be in (0, 1]:
