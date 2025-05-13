@@ -16,9 +16,9 @@ url = "https://github.com/sergiudm"
 icon = "brand-github"
 
 [[social]]
-identifier = "twitter"
-name = "Twitter"
-url = "https://twitter.com"
+identifier = "openreview"
+name = "OpenReview"
+url = "https://openreview.net/profile?id=~Qijun_Han2"
 
-[social.params]
-icon = "brand-twitter"
+# [social.params]
+# icon = "brand-openreview"
