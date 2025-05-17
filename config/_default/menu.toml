@@ -15,10 +15,10 @@ url = "https://github.com/sergiudm"
 [social.params]
 icon = "brand-github"
 
-[[social]]
-identifier = "openreview"
-name = "OpenReview"
-url = "https://openreview.net/profile?id=~Qijun_Han2"
+# [[social]]
+# identifier = "openreview"
+# name = "OpenReview"
+# url = "https://openreview.net/profile?id=~Qijun_Han2"
 
 # [social.params]
 # icon = "brand-openreview"
