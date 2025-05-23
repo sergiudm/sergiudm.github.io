@@ -1,5 +1,5 @@
 ---
-title: "The Evolution of RWKV(part 3)"
+title: "The Evolution of RWKV (Part 3)"
 date: 2025-04-14 00:00:00+0000
 draft: true
 weight: 1
