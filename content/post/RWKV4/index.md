@@ -50,7 +50,7 @@ $$
 
 Let's dissect this. The new $(\mathbf{k_t}, \mathbf{v_t})$ pair is added, but the most interesting part is the **state transition matrix $\mathbf{G}_t$**, which is applied to the old state $\mathbf{S}_{t-1}$.
 
-`G_t` has a special structure called **Diagonal Plus Low-Rank (DPLR)**:
+$\mathbf{G}_t$ has a special structure called **Diagonal Plus Low-Rank (DPLR)**:
 
 $$
 \mathbf{G}_t = \text{diag}(w_t) - \kappa_t^T (a_t \circ \kappa_t)
