@@ -75,19 +75,23 @@ This gives the model a flexible, internal scratchpad that it can modify as it pr
 
 So, we have a more complex formula. But what does it actually *buy* us? The answer lies in the esoteric-sounding but deeply important field of **computational complexity theory**. The question is: What class of problems can a model architecture *fundamentally compute*?
 
-**The Transformer's Limit: `TC^0` and the Immutable State**
+**The Transformer's Limit: $TC^0$ and the Immutable State**
 
-Think of a single layer of a neural network as a computational circuit. For a fixed input length, a Transformer's attention mechanism can be unrolled into a circuit of logic gates. Researchers have shown that this circuit belongs to a complexity class called **`TC^0`**.
+Think of a single layer of a neural network as a computational circuit. For a fixed input length, a Transformer's attention mechanism can be unrolled into a circuit of logic gates. Researchers have shown that this circuit belongs to a complexity class called **$TC^0$**.
 
-*   **What is `TC^0`?** It's the class of problems solvable by circuits with a **constant depth** (no matter how long the input is) and polynomial size, using threshold gates (e.g., "fire if more than 50% of inputs are active").
+*   **What is $TC^0$?** It's the class of problems solvable by circuits with a **constant depth** (no matter how long the input is) and polynomial size, using threshold gates (e.g., "fire if more than 50% of inputs are active").
 *   **The Good:** This is why Transformers are so parallelizable! A constant-depth circuit can be evaluated extremely quickly.
-*   **The Bad:** This is also a fundamental limitation. There are many "simple" problems that are believed to be impossible to solve in `TC^0`, because they require sequential logic.
+*   **The Bad:** This is also a fundamental limitation. There are many "simple" problems that are believed to be impossible to solve in $TC^0$, because they require sequential logic.
+
+<div style="text-align: center;">
+  <img src="image-1.png" alt="Expressibility. Source: https://arxiv.org/abs/2505.19488" width="400"/>
+</div>
 
 The core reason for this limitation is that a Transformer's state—the Key-Value (KV) cache—is **immutable**. It's an append-only log. When the model processes token #100, it cannot go back and change what it stored for token #5. It can only choose to *attend* to it or not.
 
-**RWKV-7's Power: `NC^1` and the Mutable State**
+**RWKV-7's Power: $NC^1$ and the Mutable State**
 
-RWKV-7 breaks this barrier. Its state `S_t` is **mutable**. The DPLR update rule allows it to fundamentally rewrite its own memory at each step.
+RWKV-7 breaks this barrier. Its state $S_t$ is **mutable**. The DPLR update rule allows it to fundamentally rewrite its own memory at each step.
 
 Let's use a simple example to see why this is so powerful: **The Swap Problem**.
 
@@ -100,7 +104,7 @@ Let's use a simple example to see why this is so powerful: **The Swap Problem**.
 
 A Transformer would find this very difficult. It has to indirectly reason about the changing positions through its attention patterns. An RWKV-7 model, however, can solve this directly. It can initialize its state matrix to be the identity matrix. Each swap instruction causes it to construct a **permutation matrix** (which is a DPLR matrix!) and multiply its current state by it. The final state matrix *is* the permutation that describes the final ordering.
 
-This problem is known to be in a higher complexity class called **`NC^1`** (problems solvable by logarithmic-depth circuits), which is strongly believed to be more powerful than `TC^0`. By solving this, RWKV-7 proves it is fundamentally more expressive than a Transformer.
+This problem is known to be in a higher complexity class called **$NC^1$** (problems solvable by logarithmic-depth circuits), which is strongly believed to be more powerful than $TC^0$. By solving this, RWKV-7 proves it is fundamentally more expressive than a Transformer.
 
 ## The Punchline: Recognizing Any Regular Language
 
