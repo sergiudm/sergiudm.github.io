@@ -25,9 +25,9 @@ $$
 S_t = S_{t-1} + v_t^T k_t
 $$
 
-Here, the state `S` (a matrix in RWKV-5+) simply accumulates the outer products of keys and values.
+Here, the state $\mathbf{S}$ (a matrix in RWKV-5+) simply accumulates the outer products of keys and values.
 
-The **Delta Rule**, first proposed by Widrow and Hoff in 1960, frames this differently. It sees the state `S` as a set of weights for an online learning problem. The goal is to update `S` so that when queried with a key `k`, it produces the corresponding value `v`. When a new $(k_t, v_t)$ pair arrives, we update the state to correct the error on this new example. This update rule, for a single step of gradient descent, is:
+The **Delta Rule**, first proposed by Widrow and Hoff in 1960, frames this differently. It sees the state $\mathbf{S}$ as a set of weights for an online learning problem. The goal is to update $\mathbf{S}$ so that when queried with a key $\mathbf{k}$, it produces the corresponding value $\mathbf{v}$. When a new $(\mathbf{k_t}, \mathbf{v_t})$ pair arrives, we update the state to correct the error on this new example. This update rule, for a single step of gradient descent, is:
 
 $$
 S_t = S_{t-1}(I - \alpha k_t^T k_t) + \alpha v_t^T k_t
@@ -48,26 +48,26 @@ $$
 S_t = S_{t-1} G_t + v_t^T k_t
 $$
 
-Let's dissect this. The new `(v_t, k_t)` pair is added, but the most interesting part is the **state transition matrix `G_t`**, which is applied to the old state `S_{t-1}`.
+Let's dissect this. The new $(\mathbf{k_t}, \mathbf{v_t})$ pair is added, but the most interesting part is the **state transition matrix $\mathbf{G}_t$**, which is applied to the old state $\mathbf{S}_{t-1}$.
 
 `G_t` has a special structure called **Diagonal Plus Low-Rank (DPLR)**:
 
 $$
-G_t = \text{diag}(w_t) - \kappa_t^T (a_t \circ \kappa_t)
+\mathbf{G}_t = \text{diag}(w_t) - \kappa_t^T (a_t \circ \kappa_t)
 $$
 
 This formula is the engine of RWKV-7. Let's examine its two components:
 
-1.  **`diag(w_t)` (The Diagonal Part):** This is the familiar **per-channel decay** we developed in RWKV-6. It's a diagonal matrix, meaning it applies a separate, data-dependent decay `w_t` to each feature channel (i.e., each column of the state matrix `S`). This is our "evaporation" or "forgetting" over time.
+1.  **$\text{diag}(w_t)$ (The Diagonal Part):** This is the familiar **per-channel decay** we developed in RWKV-6. It's a diagonal matrix, meaning it applies a separate, data-dependent decay $w_t$ to each feature channel (i.e., each column of the state matrix $\mathbf{S}$). This is our "evaporation" or "forgetting" over time.
 
-2.  **`- κ_t^T (a_t ◦ κ_t)` (The Low-Rank Part):** This is our powerful new "replace" mechanism, derived from the Delta Rule. It's a rank-1 matrix, which is computationally cheap.
-    *   **`κ_t` (Kappa)** is the **removal key**. This vector specifies *what information to remove* from the state. Crucially, in RWKV-7, this is **decoupled** from the replacement key `k_t`. The model can choose to remove information associated with one concept while writing information about another.
-    *   **`a_t` (Alpha)** is the **vector-valued in-context learning rate**. This is a vector of values between 0 and 1 that controls *how much* to remove at each channel. It's also data-dependent. This gives the model fine-grained, per-channel control over the update intensity.
+2.  **$- \kappa_t^T (a_t \circ \kappa_t)$ (The Low-Rank Part):** This is our powerful new "replace" mechanism, derived from the Delta Rule. It's a rank-1 matrix, which is computationally cheap.
+    *   **$\kappa_t$** is the **removal key**. This vector specifies *what information to remove* from the state. Crucially, in RWKV-7, this is **decoupled** from the replacement key $\mathbf{k}_t$. The model can choose to remove information associated with one concept while writing information about another.
+    *   **$a_t$** is the **vector-valued in-context learning rate**. This is a vector of values between 0 and 1 that controls *how much* to remove at each channel. It's also data-dependent. This gives the model fine-grained, per-channel control over the update intensity.
 
 So, at every time step, RWKV-7 performs a sophisticated update:
-1.  It decays the entire memory state `S_{t-1}` using the dynamic `w_t`.
-2.  It surgically removes specific information located at the "address" `κ_t`, with an intensity controlled by `a_t`.
-3.  It then writes new information `v_t` at a separate "address" `k_t`.
+1.  It decays the entire memory state $\mathbf{S}_{t-1}$ using the dynamic $\mathbf{w_t}$.
+2.  It surgically removes specific information located at the "address" $\kappa_t$, with an intensity controlled by $a_t$.
+3.  It then writes new information $\mathbf{v_t}$ at a separate "address" $\mathbf{k_t}$.
 
 This gives the model a flexible, internal scratchpad that it can modify as it processes a sequence.
 
