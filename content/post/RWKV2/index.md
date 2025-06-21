@@ -6,8 +6,7 @@ weight: 1
 description: "A deep dive into the RWKV v4 architecture."
 tags: 
     - "RWKV"
-    - "lienar attention"
-    - "RNN"
+    - "linear attention"
 image: "image.png"
 categories: ["Research"]
 ---

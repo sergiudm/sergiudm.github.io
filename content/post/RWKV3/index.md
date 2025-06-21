@@ -6,7 +6,6 @@ description: "Introduce RWKV v5 and v6."
 tags: 
     - "RWKV"
     - "linear attention"
-    - "RNN"
 image: "image.png"
 categories: ["Research"]
 ---
