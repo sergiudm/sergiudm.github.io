@@ -117,3 +117,71 @@ A **regular language** is any language that can be described by a **Deterministi
 The ability to simulate *any* DFA means RWKV-7 has the theoretical machinery to perfectly track finite states and recognize rule-based patterns, a task essential for logical reasoning and structured data understanding. Classical RNNs could theoretically do this, but suffered from vanishing gradients and couldn't be trained in parallel. Transformers fundamentally cannot. RWKV-7 is the first architecture to achieve this theoretical power while retaining the parallel training and efficient inference of the RWKV family.
 
 This isn't just a theoretical curiosity. This newfound expressive power, born from the mathematics of the generalized delta rule, is what fuels the state-of-the-art performance we see from RWKV-7 on benchmarks. The theory finally explains the performance, bridging the gap between abstract formulas and real-world results.
+
+## Deeper Insight: RWKV-7 as a Fast Weight Programmer
+
+This ability to simulate a state machine is a powerful result, but it's a symptom of an even deeper principle at play. RWKV-7 isn't just a state machine; it's a form of **programmable computer**. To understand this, we need to introduce the concept of **Fast Weight Programming**.
+
+In a typical neural network, the "weights" (or parameters) are learned slowly over a massive dataset through gradient descent. We can call these **slow weights**. The idea of a "fast weight programmer," pioneered by Jürgen Schmidhuber, is that a network can also have a second set of weights—**fast weights**—that are rapidly modified *within a single forward pass*. These fast weights are stored in the network's hidden states and act as a temporary, context-specific program.
+
+This is exactly what RWKV-7 does. The state matrix $\mathbf{S}_t$ *is* the set of fast weights. It represents a temporary linear model that is constructed and modified on the fly. The key insight is this: **the state update is not an arbitrary rule, but an implementation of online gradient descent on these fast weights.**
+
+### The Gradient Descent of Fast Weights
+
+Let's derive this from first principles. Imagine the state matrix $\mathbf{S}_{t-1}$ is our current "program" or internal model. Its job is to map keys to values. When the next token arrives, it gives us a new target mapping: the key $\mathbf{k}_t$ should map to the value $\mathbf{v}_t$.
+
+How well does our current program $\mathbf{S}_{t-1}$ perform on this new task? We can measure the error with a simple loss function, the squared error:
+
+$$
+\mathcal{L}(\mathbf{S}_{t-1}) = \frac{1}{2} || \mathbf{S}_{t-1}^T \mathbf{k}_t - \mathbf{v}_t ||_2^2
+$$
+
+Our goal is to update our program from $\mathbf{S}_{t-1}$ to $\mathbf{S}_t$ by taking a single step of gradient descent to reduce this error. The standard gradient descent update rule is:
+
+$$
+\text{New Weights} = \text{Old Weights} - (\text{learning rate}) \times \nabla_{\text{Old Weights}} \mathcal{L}
+$$
+
+In our case, the "weights" are the fast weights in the matrix 
+$\mathbf{S}_{t-1}$.
+
+Let's find the gradient of our loss function with respect to $\mathbf{S}_{t-1}$:
+
+$$
+\nabla_{\mathbf{S}} \mathcal{L} = (\mathbf{S}_{t-1}^T \mathbf{k}_t - \mathbf{v}_t) \mathbf{k}_t^T
+$$
+
+Now, we plug this gradient into our update rule. Let's use $\alpha$ as our scalar learning rate:
+
+$$
+\mathbf{S}_t = \mathbf{S}_{t-1} - \alpha \left( (\mathbf{S}_{t-1}^T \mathbf{k}_t - \mathbf{v}_t) \mathbf{k}_t^T \right)^T
+$$
+$$
+\mathbf{S}_t = \mathbf{S}_{t-1} - \alpha \mathbf{k}_t (\mathbf{k}_t^T \mathbf{S}_{t-1} - \mathbf{v}_t^T)
+$$
+
+Rearranging the terms, we get:
+
+$$
+\mathbf{S}_t = \mathbf{S}_{t-1} - \alpha \mathbf{k}_t \mathbf{k}_t^T \mathbf{S}_{t-1} + \alpha \mathbf{k}_t \mathbf{v}_t^T
+$$
+
+Factoring out $\mathbf{S}_{t-1}$ on the right, we arrive at a familiar formula:
+
+$$
+\mathbf{S}_t = (I - \alpha \mathbf{k}_t \mathbf{k}_t^T) \mathbf{S}_{t-1} + \alpha \mathbf{v}_t \mathbf{k}_t^T
+$$
+
+This is precisely the **Delta Rule**. The "erase" and "write" operations are not just an intuitive idea; they are the direct mathematical consequence of performing one step of gradient descent on the fast weights to learn the new key-value association.
+
+### From Delta Rule to RWKV-7's Full Power
+
+RWKV-7 takes this foundational principle and generalizes it for maximum expressivity:
+
+1.  **Global Forgetting:** It introduces the per-channel decay `diag(w_t)`, combining the gradient descent update with a mechanism to forget information globally over time.
+2.  **Vector-Valued Learning Rate:** The scalar learning rate $\alpha$ is promoted to a data-dependent *vector* $\mathbf{a}_t$. This allows the model to learn *how much to update* for each feature channel independently.
+3.  **Decoupled Keys:** The key used for calculating the error gradient (the "erase" key, $\kappa_t$) is decoupled from the key used for the value to be written ($\mathbf{k}_t$). This adds another layer of flexibility.
+
+Combining these gives us the full RWKV-7 state transition matrix $\mathbf{G}_t = \text{diag}(\mathbf{w}_t) - \kappa_t^T (\mathbf{a}_t \circ \kappa_t)$.
+
+This re-framing is critical. A Transformer learns a static function for processing data. RWKV-7 learns a **learning algorithm** (the slow weights) that it then executes during the forward pass to rapidly program a temporary, specialized linear model (the fast weights) perfectly adapted to the immediate context. It is a model that learns how to learn, and this meta-learning capability, derived from the mathematics of online gradient descent, is the ultimate source of its power and expressivity.
