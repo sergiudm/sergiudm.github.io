@@ -21,18 +21,22 @@ The solution comes from a classic idea in machine learning, revitalized for the 
 
 The traditional state update in linear attention can be seen as:
 
-`S_t = S_{t-1} + v_t^T k_t`
+$$
+S_t = S_{t-1} + v_t^T k_t
+$$
 
 Here, the state `S` (a matrix in RWKV-5+) simply accumulates the outer products of keys and values.
 
 The **Delta Rule**, first proposed by Widrow and Hoff in 1960, frames this differently. It sees the state `S` as a set of weights for an online learning problem. The goal is to update `S` so that when queried with a key `k`, it produces the corresponding value `v`. When a new `(k_t, v_t)` pair arrives, we update the state to correct the error on this new example. This update rule, for a single step of gradient descent, is:
 
-`S_t = S_{t-1}(I - αk_t^T k_t) + αv_t^T k_t`
+$$
+S_t = S_{t-1}(I - \alpha k_t^T k_t) + \alpha v_t^T k_t
+$$
 
 Let's break this down:
 
-*   **`S_{t-1}(I - αk_t^T k_t)`:** This is the "erase" step. We take the old state `S_{t-1}` and subtract a portion `α` of the information it holds specifically at the address `k_t`.
-*   **`+ αv_t^T k_t`:** This is the "write" step. We add the new information `v_t` at the address `k_t`.
+*   **`S_{t-1}(I - \alpha k_t^T k_t)`:** This is the "erase" step. We take the old state `S_{t-1}` and subtract a portion `\alpha` of the information it holds specifically at the address `k_t`.
+*   **`+ \alpha v_t^T k_t`:** This is the "write" step. We add the new information `v_t` at the address `k_t`.
 
 Instead of just adding, the Delta Rule allows the model to **partially replace** old information with new information at a specific key. It can finally take the red dye out of the bucket. This is the conceptual heart of RWKV-7.
 
@@ -40,13 +44,17 @@ Instead of just adding, the Delta Rule allows the model to **partially replace**
 
 RWKV-7 takes this core idea and supercharges it. The full state evolution looks like this:
 
-`S_t = S_{t-1} G_t + v_t^T k_t`
+$$
+S_t = S_{t-1} G_t + v_t^T k_t
+$$
 
 Let's dissect this. The new `(v_t, k_t)` pair is added, but the most interesting part is the **state transition matrix `G_t`**, which is applied to the old state `S_{t-1}`.
 
 `G_t` has a special structure called **Diagonal Plus Low-Rank (DPLR)**:
 
-`G_t = diag(w_t) - κ_t^T (a_t ◦ κ_t)`
+$$
+G_t = \text{diag}(w_t) - \kappa_t^T (a_t \circ \kappa_t)
+$$
 
 This formula is the engine of RWKV-7. Let's examine its two components:
 

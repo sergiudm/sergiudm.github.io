@@ -27,10 +27,10 @@ The state of an RWKV-4 layer, the `wkv` state, is a vector. At each step, we upd
 
 What does this actually mean? Let’s unpack the change.
 
-*   In **RWKV-4**, the state update is conceptually `s_t = w * s_{t-1} + k_t * v_t`. The state `s` is a vector.
-*   In **RWKV-5**, the state update becomes `S_t = diag(w) * S_{t-1} + k_t^T * v_t`. Notice the capital `S`—our state is now a matrix.
+*   In **RWKV-4**, the state update is conceptually $s_t = w * s_{t-1} + k_t * v_t$. The state `s` is a vector.
+*   In **RWKV-5**, the state update becomes $S_t = \text{diag}(w) * S_{t-1} + k_t^T * v_t$. Notice the capital `S`—our state is now a matrix.
 
-This isn't just a minor change in shape; it's a fundamental shift in how the model remembers things. The new `k_t^T * v_t` operation creates an **outer product**, resulting in a rank-1 matrix. This matrix is then added to the existing state matrix `S`.
+This isn't just a minor change in shape; it's a fundamental shift in how the model remembers things. The new $k_t^T * v_t$ operation creates an **outer product**, resulting in a rank-1 matrix. This matrix is then added to the existing state matrix $S$.
 
 Think of it like this:
 
@@ -60,7 +60,9 @@ Finch makes the time-decay parameter `w` **data-dependent**. Instead of being a 
 
 How is this done efficiently? We took inspiration from Low-Rank Adaptation (LoRA). We use a small, data-dependent function to produce an "offset" that modifies the base time-decay vector.
 
-`w_t = base_decay + LoRA(x_t)`
+$$
+w_t = \text{base_decay} + \text{LoRA}(x_t)
+$$
 
 This is a profound change. It gives the model a **dynamic memory management system**.
 

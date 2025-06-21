@@ -3,7 +3,7 @@ title: "The Evolution of RWKV (Part 1)"
 date: 2025-04-02 21:00:00+0000
 weight: 1
 description: "This is a series of posts about the RWKV architecture(From v4 to v7)"
-image: "image.png"
+image: "imagecopy.png"
 categories:
     - "Research"
 tags:
