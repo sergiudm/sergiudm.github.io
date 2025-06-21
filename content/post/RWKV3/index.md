@@ -5,7 +5,7 @@ weight: 1
 description: "Introduce RWKV v5 and v6."
 tags: 
     - "RWKV"
-    - "lienar attention"
+    - "linear attention"
     - "RNN"
 image: "image.png"
 categories: ["Research"]
