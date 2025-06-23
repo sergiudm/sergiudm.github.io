@@ -58,7 +58,7 @@ $$
 
 This formula is the engine of RWKV-7. Let's examine its two components:
 
-1.  **$\text{diag}(w_t)$ (The Diagonal Part):** This is the familiar **per-channel decay** we developed in RWKV-6. It's a diagonal matrix, meaning it applies a separate, data-dependent decay $w_t$ to each feature channel (i.e., each column of the state matrix $\mathbf{S}$). This is our "evaporation" or "forgetting" over time.
+1.  **$\text{diag}(w_t)$ (The Diagonal Part):** This is the **per-channel decay** we saw in RWKV-6. It's a diagonal matrix, meaning it applies a separate, data-dependent decay $w_t$ to each feature channel (i.e., each column of the state matrix $\mathbf{S}$). This is our "evaporation" or "forgetting" over time.
 
 2.  **$- \kappa_t^T (a_t \circ \kappa_t)$ (The Low-Rank Part):** This is our powerful new "replace" mechanism, derived from the Delta Rule. It's a rank-1 matrix, which is computationally cheap.
     *   **$\kappa_t$** is the **removal key**. This vector specifies *what information to remove* from the state. Crucially, in RWKV-7, this is **decoupled** from the replacement key $\mathbf{k}_t$. The model can choose to remove information associated with one concept while writing information about another.
