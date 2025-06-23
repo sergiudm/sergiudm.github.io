@@ -1,6 +1,6 @@
 ---
 title: "The Evolution of RWKV (Part 1)"
-date: 2025-04-02 21:00:00+0000
+date: 2025-04-09 21:00:00+0000
 description: "This is a series of posts about the RWKV architecture(From v4 to v7)"
 image: "imagecopy.png"
 categories:
