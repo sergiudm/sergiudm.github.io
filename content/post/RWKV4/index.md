@@ -53,20 +53,20 @@ Let's dissect this. The new $(\mathbf{k_t}, \mathbf{v_t})$ pair is added, but th
 $\mathbf{G}_t$ has a special structure called **Diagonal Plus Low-Rank (DPLR)**:
 
 $$
-\mathbf{G}_t = \text{diag}(w_t) - \kappa_t^T (a_t \circ \kappa_t)
+\mathbf{G}_t = \text{diag}(w_t) - \kappa_t^T (\mathbf{a_t} \circ \kappa_t)
 $$
 
 This formula is the engine of RWKV-7. Let's examine its two components:
 
 1.  **$\text{diag}(w_t)$ (The Diagonal Part):** This is the **per-channel decay** we saw in RWKV-6. It's a diagonal matrix, meaning it applies a separate, data-dependent decay $w_t$ to each feature channel (i.e., each column of the state matrix $\mathbf{S}$). This is our "evaporation" or "forgetting" over time.
 
-2.  **$- \kappa_t^T (a_t \circ \kappa_t)$ (The Low-Rank Part):** This is our powerful new "replace" mechanism, derived from the Delta Rule. It's a rank-1 matrix, which is computationally cheap.
+2.  **$- \kappa_t^T (\mathbf{a_t} \circ \kappa_t)$ (The Low-Rank Part):** This is our powerful new "replace" mechanism, derived from the Delta Rule. It's a rank-1 matrix, which is computationally cheap.
     *   **$\kappa_t$** is the **removal key**. This vector specifies *what information to remove* from the state. Crucially, in RWKV-7, this is **decoupled** from the replacement key $\mathbf{k}_t$. The model can choose to remove information associated with one concept while writing information about another.
-    *   **$a_t$** is the **vector-valued in-context learning rate**. This is a vector of values between 0 and 1 that controls *how much* to remove at each channel. It's also data-dependent. This gives the model fine-grained, per-channel control over the update intensity.
+    *   **$\mathbf{a_t}$** is the **vector-valued in-context learning rate**. This is a vector of values between 0 and 1 that controls *how much* to remove at each channel. It's also data-dependent. This gives the model fine-grained, per-channel control over the update intensity.
 
 So, at every time step, RWKV-7 performs a sophisticated update:
 1.  It decays the entire memory state $\mathbf{S}_{t-1}$ using the dynamic $\mathbf{w_t}$.
-2.  It surgically removes specific information located at the "address" $\kappa_t$, with an intensity controlled by $a_t$.
+2.  It surgically removes specific information located at the "address" $\kappa_t$, with an intensity controlled by $\mathbf{a_t}$.
 3.  It then writes new information $\mathbf{v_t}$ at a separate "address" $\mathbf{k_t}$.
 
 This gives the model a flexible, internal scratchpad that it can modify as it processes a sequence.
