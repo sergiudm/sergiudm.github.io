@@ -6,7 +6,7 @@ tags:
     - "RWKV"
     - "linear attention"
 image: "image.png"
-categories: ["Research"]
+categories: ["RWKV"]
 ---
 In the [last part of our journey](https://sergiudm.github.io/p/the-evolution-of-rwkv-part-2/), we saw how RWKV evolved from an unstable experiment (v2) into a robust and powerful architecture (v4). The key breakthrough in v4 was the **time-shift** and mechanism and the `wkv` operation, which brilliantly allowed a model with an RNN's soul to be trained with a Transformer's parallelism. It was a monumental step, proving that you could have the best of both worlds: efficient O(1) inference and scalable, parallel training.
 
