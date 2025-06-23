@@ -5,4 +5,7 @@ description: "An elegant tool to manage Python Projects."
 tags: 
     - "uv"
 categories: ["tools"]
+image: "image.png"
 ---
+
+If you're a conda user, 

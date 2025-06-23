@@ -2,7 +2,6 @@
 title: "The Evolution of RWKV (Part 2)"
 date: 2025-04-04 03:00:00+0000
 draft: false
-weight: 1
 description: "A deep dive into the RWKV v4 architecture."
 tags: 
     - "RWKV"
