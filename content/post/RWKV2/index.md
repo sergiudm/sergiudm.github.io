@@ -8,7 +8,7 @@ tags:
     - "RWKV"
     - "linear attention"
 image: "image.png"
-categories: ["Research"]
+categories: ["RWKV"]
 ---
 
 # [Linear Attention](https://arxiv.org/abs/2006.16236) Basics

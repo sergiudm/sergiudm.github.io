@@ -5,7 +5,7 @@ weight: 1
 description: "This is a series of posts about the RWKV architecture(From v4 to v7)"
 image: "imagecopy.png"
 categories:
-    - "Research"
+    - "RWKV"
 tags:
     - "RWKV"
     - "RNN"

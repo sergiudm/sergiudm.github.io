@@ -2,12 +2,12 @@
 title: "The Evolution of RWKV (Part 4)"
 date: 2025-04-30 00:00:00+0000
 weight: 1
-description: "Introduce RWKV v7."
+description: "Introduce RWKV v7"
 tags: 
     - "RWKV"
     - "linear attention"
 image: "image.png"
-categories: ["Research"]
+categories: ["RWKV"]
 ---
 In the last three parts of our journey, we solved the parallelism problem with v4's time-shift, enriched the model's memory with v5's matrix-valued states, and made that memory context-aware with v6's dynamic decay. Each step made the model faster and smarter.
 
