@@ -151,9 +151,9 @@ dependencies = [
 together with a new file, `uv.lock`, which contains the exact versions of the packages that were installed. 
 Also, a new directory `./venv` has been created, which contains the virtual environment for the project. You can activate it using the aforementioned command.
 
-Note that if you use `uv pip install <package>`, it will install the package in the current virtual environment, but it will not update the `pyproject.toml` file or create a `uv.lock` file. So it is recommended to use `uv add <package>` instead.
+Note that if you use `uv pip install <package>`, it will install the package in the current virtual environment, but it will not update the `pyproject.toml` file or create a `uv.lock` file. So you should decide whether you want to use `uv add` or `uv pip install` based on your needs.
 
-### Removing Dependencies
+### Changing/Removing Dependencies
 
 
 ### Managing Python Versions
