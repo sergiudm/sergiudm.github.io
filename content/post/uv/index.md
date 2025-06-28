@@ -1,7 +1,7 @@
 ---
 title: "90% You Need to Know about uv"
 date: 2025-06-12 00:00:00+0000
-description: "An elegant tool to manage Python Projects."
+description: "An elegant tool to manage Python projects."
 tags: 
     - "uv"
 categories: ["tools"]
