@@ -6,6 +6,7 @@ categories:
     - "Counterintuitive Deep Learning"
 tags:
     - "RNN"
+draft: true
 
 ---
 # Introduction

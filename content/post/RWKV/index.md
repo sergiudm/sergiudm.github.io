@@ -1,7 +1,7 @@
 ---
 title: "The Evolution of RWKV (Part 1)"
 date: 2025-04-09 21:00:00+0000
-description: "This is a series of posts about the RWKV architecture(From v4 to v7)"
+description: "This is a series of posts about the RWKV architecture (From v4 to v7)"
 image: "imagecopy.png"
 categories:
     - "RWKV"
@@ -12,25 +12,36 @@ tags:
 ---
 
 # Overview
-This is a series of posts about the RWKV architecture. The RWKV architecture is a novel neural network architecture that combines the strengths of recurrent neural networks (RNNs) and linear attention mechanisms. In this series, I will explore the design and implementation of the RWKV architecture, and during the journey, I will also discuss the relationship between the RWKV architecture and other popular neural network architectures, such as [GLA](https://arxiv.org/abs/2312.06635) and [DeltaNet](https://arxiv.org/abs/2406.06484).
 
-# Before we go: traditional softmax attention
-Before we dive into the RWKV architecture, let's first review the traditional softmax attention mechanism, which is a key component of many modern neural network architectures, including transformers.
-The attention mechanism allows the model to focus on different parts of the input sequence when making predictions. It computes a weighted sum of the input tokens, where the weights are determined by the similarity between the query and key vectors.
+Welcome to this series exploring the RWKV architecture. RWKV is a novel neural network design that merges the efficient inference of Recurrent Neural Networks (RNNs) with the parallelizable training of linear attention mechanisms.
+
+In this series, I will dissect the design and implementation of RWKV. Along the journey, I will also discuss how it relates to other emerging architectures, such as [GLA](https://arxiv.org/abs/2312.06635) and [DeltaNet](https://arxiv.org/abs/2406.06484).
+
+# Prerequisite: Traditional Softmax Attention
+
+Before diving into RWKV, we must first review the traditional softmax attention mechanism—the backbone of modern Transformers.
+
+The attention mechanism enables a model to focus on specific parts of an input sequence when making predictions. It computes a weighted sum of input tokens, where the weights are derived from the similarity between a *query* vector and a set of *key* vectors.
 
 Given a sequence of $n$ tokens $\mathbf{x} = \begin{bmatrix} \mathbf{x}_1 \\ \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_n \end{bmatrix} \in \mathbb{R}^{n \times d}$, the (non-causal) attention output can be expressed as:
 
 $$
-\text{Attn}(t) = \sum_{i=1}^n \alpha(i,t)\mathbf{v}_i=\sum_{i=1}^{n} \frac{\text{sim}(\mathbf{q_t, k_i})}{\sum_{j=1}^{n} \text{sim}(\mathbf{q_t, k_j})} \mathbf{v}_i=\sum_{i=1}^{n} \frac{\exp(\mathbf{q_t k_i^T})}{\sum_{j=1}^{n} \exp(\mathbf{q_t k_j^T})} \mathbf{v}_i \in \mathbb{R}^{d}
+\text{Attn}(t) = \sum_{i=1}^n \alpha(i,t)\mathbf{v}_i=\sum_{i=1}^{n} \frac{\text{sim}(\mathbf{q}_t, \mathbf{k}_i)}{\sum_{j=1}^{n} \text{sim}(\mathbf{q}_t, \mathbf{k}_j)} \mathbf{v}_i=\sum_{i=1}^{n} \frac{\exp(\mathbf{q}_t \mathbf{k}_i^T)}{\sum_{j=1}^{n} \exp(\mathbf{q}_t \mathbf{k}_j^T)} \mathbf{v}_i \in \mathbb{R}^{d}
 $$
 
-where $\mathbf{q}_t$, $\mathbf{k}_i$, and $\mathbf{v}_i$ are the query, key, and value vectors for the $t$-th token and the $i$-th token, respectively. The attention weights $\alpha(i,t)$ are computed using the softmax function, which normalizes the scores to sum to 1.
+Here, $\mathbf{q}_t$, $\mathbf{k}_i$, and $\mathbf{v}_i$ represent the query, key, and value vectors for the $t$-th and $i$-th tokens, respectively. The attention weights $\alpha(i,t)$ are computed using the softmax function, which normalizes the scores to ensure they sum to 1.
 
-## Conputation cost
-It is easy to see that the attention computation has a time complexity of $O(n^2)$, since for each token $t$, we need to compute the attention weights for **all** $n$ tokens. This can be a bottleneck for long sequences, as the computation time increases quadratically with the sequence length. (during inference, the cost is still $O(n^2)$ even if you apply the cache mechanism to speed up the computation.)
+## Computation Cost
+
+It is easy to see that attention computation has a time complexity of $O(n^2)$. For every token $t$, we must compute attention weights against **all** $n$ tokens.
+
+This quadratic scaling becomes a significant bottleneck for long sequences. Even during inference with KV caching enabled, the cost of generating a full sequence remains quadratic regarding the sequence length, as the history the model must attend to grows larger with every step.
 
 # RNNs
-Unlike the attention mechanism, RNNs process sequences of tokens **one at a time**, maintaining a hidden state that is updated at each time step. The hidden state is computed using the previous hidden state and the current input token. The RNN can be expressed as:
+
+Unlike the attention mechanism, Recurrent Neural Networks (RNNs) process sequences **one token at a time**, maintaining a hidden state that updates at each time step.
+
+The hidden state is derived from the previous hidden state and the current input token. The formulation is as follows:
 
 $$
 \mathbf{h}_t = f(\mathbf{h}_{t-1} \mathbf{W}_{h} + \mathbf{x}_t \mathbf{W}_x+ \mathbf{b}_h)
@@ -40,36 +51,45 @@ $$
 \mathbf{y}_t = g(\mathbf{h}_t \mathbf{W}_y + \mathbf{b}_y)
 $$
 
-where $\mathbf{h}_t$ is the hidden state at time step $t$, and $\mathbf{y}_t$ is the output at time step $t$. The function $f$ (and $g$) is typically a non-linear activation function. The matrices $\mathbf{W}_h$, $\mathbf{W}_x$, and $\mathbf{W}_y$ are the weight matrices for the hidden state, input, and output, respectively, and $\mathbf{b}$ and $\mathbf{b}_y$ are the bias vectors.
+Where $\mathbf{h}_t$ is the hidden state at time step $t$, and $\mathbf{y}_t$ is the output. The functions $f$ and $g$ are typically non-linear activations. $\mathbf{W}_h$, $\mathbf{W}_x$, and $\mathbf{W}_y$ are the weight matrices for the hidden state, input, and output, respectively, while $\mathbf{b}_h$ and $\mathbf{b}_y$ are the bias vectors.
 
-## Computation cost
-Notice that the hidden state $\mathbf{h}_t$ is calculated only with the **previous** hidden state $\mathbf{h}_{t-1}$ and the current input token $\mathbf{x}_t$ instead of the entire $\{\mathbf{h_0,h_1,\ldots,h_{t-1}\}}$. This means that at each time step, the computation cost is $O(1)$ (we don't consider the dimension of the hidden state so far). Thus, the total computation cost for processing a sequence of length $n$ is $O(n)$, which is much more efficient than the attention mechanism for long sequences.
+## Computation Cost
 
-# Question: Does $O(n)$ mean that RNNs are better than softmax attention?
-Unfortunately, the answer is **NO**. There are several reasons why RNNs are not as effective as softmax attention for long sequences, and some of the most important reasons include:
+Notice that the hidden state $\mathbf{h}_t$ depends only on the **immediate predecessor** $\mathbf{h}_{t-1}$ and the current input $\mathbf{x}_t$, rather than the entire history $\{\mathbf{h}_0, \mathbf{h}_1, \ldots, \mathbf{h}_{t-1}\}$.
 
-## **Parallelization**: 
->Although attention has a higher computation cost, it can be **parallelized** across all tokens in the sequence. 
+This means that at each time step, the computation cost is $O(1)$ (ignoring the fixed dimensions of the hidden state). Consequently, the total computation cost for processing a sequence of length $n$ is $O(n)$—linear scaling—which is far more efficient than attention mechanisms for long sequences.
 
-Let's look at the attention output again:
-   
+# Question: Does $O(n)$ mean RNNs are superior?
+
+The short answer is **NO**. While efficient, traditional RNNs historically failed to replace Transformers. There are two primary reasons why RNNs struggle against softmax attention:
+
+## 1\. Parallelization
+
+> Although attention has a higher total computation cost, it can be **parallelized** across all tokens in the sequence.
+
+Let's look at the attention equation again:
+
 $$
-\text{Attn}(t)=\sum_{i=1}^{n} \frac{\exp(\mathbf{q_t k_i^T})}{\sum_{j=1}^{n} \exp(\mathbf{q_t k_j^T})} \mathbf{v}_i = \text{softmax}(\mathbf{q}_t \mathbf{K}^T)\mathbf{V}
+\text{Attn}(t)=\sum_{i=1}^{n} \frac{\exp(\mathbf{q}_t \mathbf{k}_i^T)}{\sum_{j=1}^{n} \exp(\mathbf{q}_t \mathbf{k}_j^T)} \mathbf{v}_i = \text{softmax}(\mathbf{q}_t \mathbf{K}^T)\mathbf{V}
 $$
 
-From the equation, it's clear to see that $\text{Attn}(t)$ only depends on 't' (no 
-t-1 or t-2 stuff in the equation). This means that we can compute the attention output for all tokens in the sequence at the same time, which is a huge advantage when training on GPUs or TPUs. 
+In this equation, calculating $\text{Attn}(t)$ does not rely on the output of $\text{Attn}(t-1)$. There are no sequential dependencies on previous time steps during calculation. This allows us to compute the attention output for every token in the sequence simultaneously, offering a massive advantage when training on modern hardware like GPUs or TPUs.
 
-For instance, to train our transformer neural network, given a sequence $\{\mathbf{x}_1,\mathbf{x}_2,\mathbf{x}_3\}$, we want to compute the attention output $\{\mathbf{y}_1,\mathbf{y}_2,\mathbf{y}_3\}$. Instead of computing $\mathbf{y}_1$ first and then $\mathbf{y}_2$, we can compute $\mathbf{y}_1$, $\mathbf{y}_2$, and $\mathbf{y}_3$ at the same time. In contrast, RNNs process tokens sequentially, which means that the computation for later tokens must wait for the computation of earlier tokens to finish. This can lead to longer training time.
+In contrast, RNNs are inherently sequential. To compute the state for token $t$, you must first finish the computation for token $t-1$. This sequential dependency prevents parallel training, leading to significantly longer training times.
 
-## **Long-range dependencies**: 
->RNNs struggle to capture long-range dependencies in sequences, especially when the sequences are very long. 
+## 2\. Long-range Dependencies
 
-This is because the fixed size hidden state $\mathbf{h}_t$ is updated at each time step, and information from earlier tokens can be lost or diluted as it passes through the network. In contrast, attention mechanisms can directly access all tokens in the sequence, allowing them to capture long-range dependencies more effectively.
+> RNNs struggle to capture long-range dependencies, particularly in very long sequences.
+
+Because the hidden state $\mathbf{h}_t$ is fixed in size and updated at every step, information from early tokens tends to "vanish" or become diluted as it propagates through the network. Softmax attention, however, has direct access to the entire history (the "global view"), allowing it to recall information from any point in the sequence with equal ease.
 
 # Summary
-In summary, while RNNs have a lower computation cost for processing sequences during inference, they are not as effective as attention mechanisms for capturing long-range dependencies and parallelizing computations during training. In the next post, we will explore the RWKV architecture and how it combines the strengths of both RNNs and attention mechanisms to achieve better performance on long sequences.
+
+In summary, while RNNs offer lower inference costs ($O(n)$ vs $O(n^2)$), traditional RNNs cannot match the training parallelization or the long-range recall capabilities of Transformers.
+
+In the next post, we will explore how the RWKV architecture solves this dilemma, combining the parallel training of Transformers with the efficient inference of RNNs.
 
 # References
-- [Gated Linear Attention Transformers with Hardware-Efficient Training](https://arxiv.org/abs/2312.06635)
-- [Parallelizing Linear Transformers with the Delta Rule over Sequence Length](https://arxiv.org/abs/2406.06484)
+
+  - [Gated Linear Attention Transformers with Hardware-Efficient Training](https://arxiv.org/abs/2312.06635)
+  - [Parallelizing Linear Transformers with the Delta Rule over Sequence Length](https://arxiv.org/abs/2406.06484)

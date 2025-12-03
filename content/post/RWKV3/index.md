@@ -8,81 +8,112 @@ tags:
 image: "image.png"
 categories: ["RWKV"]
 ---
-In the [last part of our journey](https://sergiudm.github.io/p/the-evolution-of-rwkv-part-2/), we saw how RWKV evolved from an unstable experiment (v2) into a robust and powerful architecture (v4). The key breakthrough in v4 was the **time-shift** and mechanism and the `wkv` operation, which brilliantly allowed a model with an RNN's soul to be trained with a Transformer's parallelism. It was a monumental step, proving that you could have the best of both worlds: efficient O(1) inference and scalable, parallel training.
 
-But once you’ve solved a problem like parallelism, a new, more ambitious question arises: **Is it possible to make it *even smarter*?**
+In the [previous blog](https://sergiudm.github.io/p/the-evolution-of-rwkv-part-2/), we've seen RWKV v4, where the core "Time Mixing" mechanism relied on a channel-wise update rule. In its recurrent form, the state update looked something like this:
 
-The AI research landscape was buzzing with this question. The goal was no longer just efficiency; it was about increasing the model's **expressive power** to truly rival the quadratic attention of a full Transformer.
+$$wkv_t = \frac{\sum_{i=1}^{t-1} e^{-(t-1-i)w + k_i} \odot v_i + e^{u+k_t} \odot v_t}{\sum_{i=1}^{t-1} e^{-(t-1-i)w + k_i} + e^{u+k_t}}$$
 
-This is the story of RWKV-5 (Eagle) and RWKV-6 (Finch): the evolution from a clever linear RNN into a sophisticated model with deep, dynamic memory.
+Here, the decay $w$ and the keys/values ($k, v$) interact via **element-wise** operations ($\odot$). While elegant, this design compresses the entire history into a single vector $h \in \mathbb{R}^D$.
 
-## RWKV-5 (Eagle): From Flat Vectors to Rich Matrices
+# The Hardware Lottery
 
-Before we dive into RWKV-5, let’s recap the core idea of RWKV-4. 
+Before we meet the architectural shift in RWKV v5, we must first understand the silicon soil in which these models grow. We live in the era where the winning algorithms are not necessarily the most theoretically elegant, but the ones that best **align with the idiosyncrasies** of modern hardware.
 
-The state of an RWKV-4 layer, the `wkv` state, is a vector. At each step, we update this vector by adding the new information (`k*v`) and decaying the old state. It’s effective, but it’s also a bottleneck. All the rich, multi-faceted information from past tokens gets compressed into a single, flat vector for each channel.
+Speek in a "deep learning" way, the **Tensor Core** is king.
 
-**The core insight of RWKV-5 was to upgrade this state from a vector to a matrix.**
+## The Specialized Beast
+Modern GPUs (like the NVIDIA A100 or H100) are not merely collections of generic calculators. They possess specialized execution units known as Tensor Cores, designed for one specific purpose: **Dense Matrix Multiplication.**
 
-What does this actually mean? Let’s unpack the change.
+While a standard **CUDA Core** operates on scalars—calculating a single multiplication and addition $(a \times b) + c$ per clock cycle—a Tensor Core operates on entire matrices at once. Specifically, it performs a fused multiply-add (FMA) on $4 \times 4$ matrices in a single operation:
 
-*   In **RWKV-4**, the state update is conceptually $s_t = w * s_{t-1} + k_t * v_t$. The state `s` is a vector.
-*   In **RWKV-5**, the state update becomes $S_t = \text{diag}(w) * S_{t-1} + k_t^T * v_t$. Notice the capital `S`—our state is now a matrix.
+$$D = A \times B + C$$
 
-This isn't just a minor change in shape; it's a fundamental shift in how the model remembers things. The new $k_t^T * v_t$ operation creates an **outer product**, resulting in a rank-1 matrix. This matrix is then added to the existing state matrix $S$.
+where $A, B, C, D$ are $4 \times 4$ matrices.
 
-Think of it like this:
+## The Magnitude of Efficiency
+The performance gap is staggering. On an A100 GPU, half-precision (FP16) matrix multiplications running on Tensor Cores can be roughly **16 times faster** than those running on standard CUDA cores.
 
-> The RWKV-4 vector state is like a single, running summary of a conversation. You keep updating the summary with new points.
->
-> The RWKV-5 matrix state is like a **full ledger or a memory bank**. Each row of the matrix can be seen as a separate "memory slot." The `k` (key) vector acts as an **address**, directing *which memory slots* the current `v` (value) vector should be written to.
+To achieve this throughput, the hardware demands specific data shapes and precision:
+* **Data Layout:** The dimensions of the tensors must be divisible by specific multiples (e.g., 8 or 16) to align with the Tensor Core's tiling logic.
+* **Precision:** These cores thrive on mixed precision (using FP16 or BF16 for multiplication while accumulating in FP32), sacrificing a sliver of accuracy for massive gains in throughput.
 
-This "matrix-valued state" allows the model to store and access past information in a much more structured and disentangled way. A single head can now maintain multiple, parallel streams of information from the past, each decaying at its own channel-specific rate. This drastically increases the model's capacity to handle complex, interwoven patterns in data without losing its linear-time recurrence.
+## The Vector Bottleneck
+This is where RWKV-4 hit a wall. RWKV-4 was built on **vector-valued states**. Its core operations involved element-wise multiplications ($\odot$) between the decay vector $w$ and the state vector $h$:
 
-Alongside this, RWKV-5 introduced other refinements:
-*   A better gating mechanism (`SiLU` on the attention output) for cleaner signal flow.
-*   Improved parameter initializations for more stable training starts.
+$$h_t = w \odot h_{t-1} + k_t \odot v_t$$
 
-With these changes, Eagle (RWKV-5) wasn't just an incremental update. It was a foundational upgrade to the model's "brain," giving it a richer, deeper memory to draw upon. Benchmark results confirmed this: Eagle significantly outperformed RWKV-4 across the board, especially on tasks requiring complex reasoning.
+Mathematically, this is sound. But architecturally, it is inefficient. Element-wise vector operations cannot be easily fused into the $4 \times 4$ matrix inputs required by Tensor Cores. They are relegated to the slower, general-purpose CUDA cores.
 
-## RWKV-6 (Finch): Making Memory Itself Context-Aware
+By adhering to vector states, RWKV-4 was essentially leaving the GPU's most powerful engine—the Tensor Core—idling. To unlock the next level of training speed and model capacity, RWKV-5 had to speak the language of matrices.
 
-Eagle gave our model a better memory structure. The next logical step was to make that memory *smarter*.
+# RWKV v5 (Eagle)
 
-In all previous versions of RWKV, the time-decay parameter `w` was a **fixed, learned vector**. Once training was done, each channel had a predetermined decay rate. A channel was either designated for "short-term memory" (high decay) or "long-term memory" (low decay), and it stuck with that role for the entire sequence, no matter the context.
+Now there's **Eagle**. The leap from v4 to v5 was the transition from **Vector States** to **Matrix States**. Instead of compressing history into a vector, Eagle unfolds the memory into a collection of matrices.
 
-But what if the model could *decide* how much to forget on the fly? What if it could say, "This is the start of a new topic, I should forget the previous paragraph," or, "This is a critical detail, I must remember it for a long time"?
+## RNN Form
+In Eagle, the hidden state $S_t$ becomes a matrix (specifically, one matrix per head). The update rule evolves from element-wise multiplication to the **outer product**:
 
-This is the groundbreaking idea behind **RWKV-6 (Finch): Dynamic Recurrence.**
+$$S_t = \text{diag}(w) \cdot S_{t-1} + k_t^T v_t$$
 
-Finch makes the time-decay parameter `w` **data-dependent**. Instead of being a static value, `w` becomes `w_t`—it is calculated at each and every time step, based on the current input `x_t`.
+Crucially, the term $k_t^T v_t$ creates a dense matrix that captures the pairwise interactions between *all* key features and *all* value features. This explodes the memory capacity from $O(D)$ to $O(D^2/H)$ without sacrificing the $O(1)$ inference speed.
 
-How is this done efficiently? We took inspiration from Low-Rank Adaptation (LoRA). We use a small, data-dependent function to produce an "offset" that modifies the base time-decay vector.
+## The Parallel Form
+For training, like RWKV v4, it can be parallelized efficiently as well. The "receptance" $r$ (acting like a Query) retrieves information from this decaying matrix history:
 
-$$
-w_t = \text{base_decay} + \text{LoRA}(x_t)
-$$
+$$wkv_t = \text{diag}(u) \cdot k_t^T \cdot v_t + \sum_{i=1}^{t-1} \text{diag}(w)^{t-1-i} \cdot k_i^T \cdot v_i$$
 
-This is a profound change. It gives the model a **dynamic memory management system**.
+This formulation allows the model to utilize Tensor Cores effectively, aligning mathematical expressivity with hardware reality.
 
-> Imagine the time decay `w` as a "Forget-Me-Not" flower for each channel.
->
-> In RWKV-4 and v5, each flower is either genetically predisposed to wilt quickly or to last a long time.
->
-> In RWKV-6, each flower can look at the "weather" (the current input token) and decide for itself whether to wilt (forget) or bloom stronger (remember).
+# RWKV v6 (Finch)
+Eagle was powerful, but it had a rigid heartbeat. The decay rate $w$ (how fast the model forgets old data) was a **learned parameter**, but it was **static** during inference.
 
-This allows for incredibly flexible behavior. The model can learn to:
-*   **Reset its state:** When it encounters a sentence or document boundary, it can learn to generate a high `w_t` (strong decay) to flush its memory and start fresh.
-*   **Preserve context:** During a long, coherent passage, it can learn to generate a low `w_t` (weak decay) to maintain context over thousands of tokens.
+$$w = \exp(-\exp(\omega))$$
 
-Finch also made the token-shift mechanism data-dependent, allowing the model to dynamically decide how much of the previous token's representation to mix in. Every core component of the recurrence became adaptive.
+Once the model was trained, $w$ was fixed. The model could not dynamically decide to "dump" its memory when the topic changed or "hold" onto a specific crucial detail for 10,000 tokens. It was like reading a book where you are forced to forget every page at the exact same speed, regardless of how interesting the plot is. A natural question is: Is there a way to **dynamically** set the decay $w$ *at every single time step* without exploding the parameter count? To achieve so, RWKV v6 utilizes **Low-Rank Adaptation (LoRA)** mechanisms inside the block.
 
-### The Journey Continues
+The decay rate $w_t$ is no longer a fixed value. Instead, it's now a function of the current input $x_t$:
 
-The evolution from RWKV-4 to v6 marks a shift in our core mission. We started by reinventing the RNN to match the Transformer's training paradigm. Now, we are pushing the boundaries of what recurrent models can do, creating architectures with unique capabilities that are not just "efficient alternatives" but powerful systems in their own right.
+$$w_t = \exp(-\exp(d_t))$$
+$$d_t = \text{LoRA}_d(\text{ddlerp}_d(x_t, x_{t-1}))$$
 
-*   **RWKV-4** gave us parallel training.
-*   **RWKV-5 (Eagle)** gave us a richer, matrix-based state.
-*   **RWKV-6 (Finch)** gave us dynamic, context-aware memory.
+Here, `ddlerp` is a data-dependent linear interpolation. The model can now look at the current token and say, "This is important, keep the memory," or "This is a new topic, wipe the slate clean".
 
-Each step has been a leap in expressivity and performance, bringing us closer to a model that combines the theoretical elegance of recurrence with the raw power of modern deep learning. The journey is far from over, but with each evolution, the potential of this architectural path becomes clearer and more exciting.
+## RNN Form
+The state update equation in Finch becomes fully time-variant:
+
+$$S_t = \text{diag}(w_t) \cdot S_{t-1} + k_t^T v_t$$
+
+This simple change—making $w$ into $w_t$—allows for "selective forgetting," a capability previously exclusive to gated architectures like LSTMs or Mamba, but now available in the RWKV linear attention framework.
+
+# Experimental Results
+
+* **Recall Mastery:** On the **Multi-Query Associative Recall (MQAR)** task—a torture test for memory—RWKV-4 (Vector) struggled as sequences grew. RWKV-6, with its dynamic matrix memory, achieved near-perfect accuracy, outperforming even Mamba and Hyena.
+
+<div style="text-align: center;">
+  <img src="image1.png" alt="MAQR result. Source: https://arxiv.org/abs/2404.05892" width="400"/>
+</div>
+    
+* **Long-Context Reasoning:** In the **Bamboo Benchmark** (long-context reasoning), both RWKV v5/6 outperformed vanilla Mamba by notable margins, proving that the matrix state is superior at holding long-range dependencies.
+
+<div style="text-align: center;">
+  <img src="image2.png" alt="Result on Bamboo Benchmark. Source: https://arxiv.org/abs/2404.05892" width="400"/>
+</div>
+
+* **Speed and Memory Superiority:** According to their [paper](https://arxiv.org/abs/2404.05892), RWKV v6 is significantly faster than Flash Attention for sequence lengths beyond 4k, being around 4.2x faster for a sequence length of 16k. Furthermore, It consistently outperforms Mamba and Flash Attention in terms of memory usage, using 40% and 17% less memory usage than Flash Attention and Mamba respectively.
+
+<div style="text-align: center;">
+  <img src="image3.png" alt="Speed comparison." width="400"/>
+</div>
+
+<div style="text-align: center;">
+  <img src="image4.png" alt="Memory usage comparison." width="400"/>
+</div>
+
+# Summary
+
+1.  **RWKV-4:** Proved linear attention could compete, but was constrained by **Vector States** (diagonal limitations).
+2.  **RWKV-5:** Unfolded the memory into **Matrix States** ($k^T v$), unlocking massive capacity and Tensor Core efficiency.
+3.  **RWKV-6:** Granted the model **Dynamic Recurrence** ($w_t$), allowing it to adaptively forget and remember based on context.
+
+# What's next?
+In the next blog, we will enter a whole new era, where we view linear attention as fast weight programmers. See [RWKV v7](https://sergiudm.github.io/p/the-evolution-of-rwkv-part-4/).
