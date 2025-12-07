@@ -33,15 +33,6 @@ In addition, I want some simple yet useful features:
 2.  **Review System:** Automated weekly/monthly reviews (e.g., working statistics, goal achievement).
 3.  **Persistent Reminders:** Notifications that actually force me to take action, rather than ones I just swipe away.
 
-# The Principles
-
-Based on my experience, I summarized the following principles for making plans:
-- Make each task as small and specific as possible.
-- Make it easy to see and adjust the plan.
-- Let an external partner to remind and nudge you.
-- Motivate yourself with visible progress.
-- Distinguish between tasks that must be done at a specific time and those that can be done anytime. For the former, the system should send notifications at the right time.
-
 # The Solution: [Schedule Everything](https://github.com/sergiudm/schedule-everything)
 
 I tried tools like Notion (too manual/heavy), Google Calendar (good for events, bad for routine flows), and Todoist (great list, but lacks the "rhythm" of a day). None of them fully satisfied my need for a programmable, local, and persistent system.
@@ -109,7 +100,7 @@ After setting up your configuration files, the daemon will read them and start t
 I use the CLI to manage tasks that don't fit into the fixed grid:
 
 ```bash
-# Add a high-priority task
+# Add a task with urgency 9 (1-10 scale)
 reminder add "Finish OS assignment" 9
 
 # Check task list ranked by urgency
@@ -131,6 +122,16 @@ reminder ddl rm 2 # Remove deadline with ID 2
 
 **4. Review System**
 The system automatically generates daily, weekly and monthly reports based on your completed tasks and habits. You can specify where to save these reports in the configuration file.
+
+## The Principles
+
+Based on my experience, I summarized the following principles for making plans with this system:
+- Make each task as small and specific as possible (e.g., "Refine the introduction of the report" instead of "Work on the report").
+- Make it easy to see and adjust the plan.
+- Let an external partner to remind and nudge you.
+- Motivate yourself with visible progress.
+- Distinguish between tasks that must be done at a specific time and those that can be done anytime. For the former, the system should send notifications at the right time.
+- For tasks with `urgency > 7`, **kill it within before the next day**.
 
 # Conclusion
 
