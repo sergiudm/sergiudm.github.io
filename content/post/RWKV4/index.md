@@ -70,6 +70,53 @@ So, at every time step, RWKV-7 performs a sophisticated update:
 
 This gives the model a flexible, internal scratchpad that it can modify as it processes a sequence.
 
+### CUDA Kernel (forward)
+```cpp
+__global__ void forward_kernel(int T, int H, F_ w_, F_ q_, F_ k_, F_ v_, F_ a_, F_ b_, bf* y_, float* s_, float* sa_) {
+    constexpr int C = _C_;
+    int bb = blockIdx.y, hh = blockIdx.x, i = threadIdx.x;
+
+    float state[C] = {0};
+    __shared__ float q[C], k[C], w[C], a[C], b[C];
+
+    for (int t = 0; t < T; t++) {
+        int ind = bb*T*H*C + t*H*C + hh * C + i;
+        __syncthreads();
+        q[i] = to_float(q_[ind]);
+        w[i] = __expf(-__expf(to_float(w_[ind])));
+        k[i] = to_float(k_[ind]);
+        a[i] = to_float(a_[ind]);
+        b[i] = to_float(b_[ind]);
+        __syncthreads();
+
+        float sa = 0;
+#pragma unroll
+        for (int j = 0; j < C; j++) {
+            sa += a[j] * state[j];
+        }
+        sa_[ind] = sa;
+
+        float v = to_float(v_[ind]);
+        float y = 0;
+#pragma unroll
+        for (int j = 0; j < C; j++) {
+            float& s = state[j];
+            s = s * w[j] + sa * b[j] + k[j] * v;
+            y += s * q[j];
+        }
+        y_[ind] = to_bf(y);
+
+        if ((t+1)%_CHUNK_LEN_ == 0) {
+            int base = (bb*H+hh)*(T/_CHUNK_LEN_)*C*C + (t/_CHUNK_LEN_)*C*C + i;
+#pragma unroll
+            for (int j = 0; j < C; j++) {
+                s_[base + j*C] = state[j];
+            }
+        }
+    }
+}
+```
+
 ## A Layman's Guide to Expressivity: Why This Matters
 
 So, we have a more complex formula. But what does it actually *buy* us? The answer lies in the esoteric-sounding but deeply important field of **computational complexity theory**. The question is: What class of problems can a model architecture *fundamentally compute*?

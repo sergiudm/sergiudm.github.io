@@ -64,6 +64,68 @@ $$wkv_t = \text{diag}(u) \cdot k_t^T \cdot v_t + \sum_{i=1}^{t-1} \text{diag}(w)
 
 This formulation allows the model to utilize Tensor Cores effectively, aligning mathematical expressivity with hardware reality.
 
+### Official WKV5 Forward [Kernel](https://github.com/BlinkDL/RWKV-LM/blob/main/RWKV-v5/cuda/wkv5_cuda.cu)
+
+```cpp
+template <typename F>
+__global__ void kernel_forward(const int B, const int T, const int C, const int H,
+                               const F *__restrict__ const _r, const F *__restrict__ const _k, const F *__restrict__ const _v, const float *__restrict__ _w, const F *__restrict__ _u,
+                               F *__restrict__ const _y)
+{
+    const int b = blockIdx.x / H;
+    const int h = blockIdx.x % H;
+    const int i = threadIdx.x;
+    _w += h*_N_;
+    _u += h*_N_;
+
+    __shared__ float r[_N_], k[_N_], u[_N_], w[_N_];
+    float state[_N_] = {0};
+
+    __syncthreads();
+    w[i] = _w[i];
+    u[i] = float(_u[i]);
+    __syncthreads();
+
+    for (int t = b*T*C + h*_N_ + i; t < (b+1)*T*C + h*_N_ + i; t += C)
+    {
+        __syncthreads();
+        r[i] = float(_r[t]);
+        k[i] = float(_k[t]);
+        __syncthreads();
+
+        const float v = float(_v[t]);
+        float y = 0;
+
+        #pragma unroll
+        for (int j = 0; j < _N_; j+=4)
+        {
+            const float4& r_ = (float4&)(r[j]);
+            const float4& k_ = (float4&)(k[j]);
+            const float4& w_ = (float4&)(w[j]);
+            const float4& u_ = (float4&)(u[j]);
+            float4& s = (float4&)(state[j]);
+            float4 x;
+
+            x.x = k_.x * v;
+            x.y = k_.y * v;
+            x.z = k_.z * v;
+            x.w = k_.w * v;
+
+            y += r_.x * (u_.x * x.x + s.x);
+            y += r_.y * (u_.y * x.y + s.y);
+            y += r_.z * (u_.z * x.z + s.z);
+            y += r_.w * (u_.w * x.w + s.w);
+
+            s.x = s.x * w_.x + x.x;
+            s.y = s.y * w_.y + x.y;
+            s.z = s.z * w_.z + x.z;
+            s.w = s.w * w_.w + x.w;
+        }
+        _y[t] = F(y);
+    }
+}
+```
+
 # RWKV v6 (Finch)
 Eagle was powerful, but it had a rigid heartbeat. The decay rate $w$ (how fast the model forgets old data) was a **learned parameter**, but it was **static** during inference.
 
@@ -84,6 +146,67 @@ The state update equation in Finch becomes fully time-variant:
 $$S_t = \text{diag}(w_t) \cdot S_{t-1} + k_t^T v_t$$
 
 This simple change—making $w$ into $w_t$—allows for "selective forgetting," a capability previously exclusive to gated architectures like LSTMs or Mamba, but now available in the RWKV linear attention framework.
+
+### Official WKV6 Forward [Kernel](https://github.com/BlinkDL/RWKV-LM/blob/main/RWKV-v5/cuda/wkv5_cuda.cu)
+
+```cpp
+template <typename F>
+__global__ void kernel_forward(const int B, const int T, const int C, const int H,
+                               const F *__restrict__ const _r, const F *__restrict__ const _k, const F *__restrict__ const _v, const F *__restrict__ _w, const F *__restrict__ _u,
+                               F *__restrict__ const _y)
+{
+    const int b = blockIdx.x / H;
+    const int h = blockIdx.x % H;
+    const int i = threadIdx.x;
+    _u += h*_N_;
+
+    __shared__ float r[_N_], k[_N_], u[_N_], w[_N_];
+    float state[_N_] = {0};
+
+    __syncthreads();
+    u[i] = float(_u[i]);
+    __syncthreads();
+
+    for (int t = b*T*C + h*_N_ + i; t < (b+1)*T*C + h*_N_ + i; t += C)
+    {
+        __syncthreads();
+        w[i] = __expf(-__expf(float(_w[t]))); // data dependent decay!
+        r[i] = float(_r[t]);
+        k[i] = float(_k[t]);
+        __syncthreads();
+
+        const float v = float(_v[t]);
+        float y = 0;
+
+        #pragma unroll
+        for (int j = 0; j < _N_; j+=4)
+        {
+            const float4& r_ = (float4&)(r[j]);
+            const float4& k_ = (float4&)(k[j]);
+            const float4& w_ = (float4&)(w[j]);
+            const float4& u_ = (float4&)(u[j]);
+            float4& s = (float4&)(state[j]);
+            float4 x;
+
+            x.x = k_.x * v;
+            x.y = k_.y * v;
+            x.z = k_.z * v;
+            x.w = k_.w * v;
+
+            y += r_.x * (u_.x * x.x + s.x);
+            y += r_.y * (u_.y * x.y + s.y);
+            y += r_.z * (u_.z * x.z + s.z);
+            y += r_.w * (u_.w * x.w + s.w);
+
+            s.x = s.x * w_.x + x.x;
+            s.y = s.y * w_.y + x.y;
+            s.z = s.z * w_.z + x.z;
+            s.w = s.w * w_.w + x.w;
+        }
+        _y[t] = F(y);
+    }
+}
+```
 
 # Experimental Results
 
