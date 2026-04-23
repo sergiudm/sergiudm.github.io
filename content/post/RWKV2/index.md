@@ -103,7 +103,7 @@ Furthermore, look at the computational complexity. By dropping `softmax` and usi
 
 For long sequence lengths $n$, where $n \gg d$, Linear Attention is significantly faster.
 
-> **Spoiler:** What if we have a causal mask? Standard matrix associativity breaks down with causal masking in a way that makes naive parallelization difficult. RWKV solves this, as we will see in the [next post](https://sergiudm.github.io/p/rwkv3/).
+> **Spoiler:** What if we have a causal mask? Standard matrix associativity breaks down with causal masking in a way that makes naive parallelization difficult. The RWKV architecture introduces an elegant solution to this, as we will see in the [next post](https://sergiudm.github.io/p/rwkv3/).
 
 # Attention Free Transformer (AFT)
 
