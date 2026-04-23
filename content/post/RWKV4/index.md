@@ -14,7 +14,7 @@ But a fundamental question lurked beneath the surface, a question that haunted a
 
 Think of the model's memory as a bucket of water. Each new token is a scoop of colored dye. The decay `w` is like some of the water evaporating, but the colors that are already mixed in stay mixed. Over time, the bucket becomes a muddy, indistinct brown. There was no way to reach in and remove *just the red dye* that was added 100 steps ago. This "muddying" effect limits how cleanly a model can handle long, complex sequences with distinct pieces of information.
 
-The solution comes from a classic idea in machine learning, revitalized for the modern age: the **Delta Rule**. This is the story of RWKV-7 "Goose"—the leap from an additive memory to a truly updatable, *mutable* state, and the profound theoretical power that this unlocks.
+The RWKV-7 research solves this by revitalizing a classic idea in machine learning for the modern age: the **Delta Rule**. This is the story of RWKV-7 "Goose"—the leap from an additive memory to a truly updatable, *mutable* state, and the profound theoretical power that this unlocks.
 
 ## From Adding to Updating: The Delta Rule
 
