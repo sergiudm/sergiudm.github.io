@@ -15,7 +15,7 @@ tags:
 
 Welcome to this series exploring the RWKV architecture. RWKV is a novel neural network design that merges the efficient inference of Recurrent Neural Networks (RNNs) with the parallelizable training of linear attention mechanisms.
 
-In this series, I will dissect the design and implementation of RWKV. Along the journey, I will also discuss how it relates to other emerging architectures, such as [GLA](https://arxiv.org/abs/2312.06635) and [DeltaNet](https://arxiv.org/abs/2406.06484).
+In this series, we will explore the design and implementation of RWKV. Along the journey, we will also discuss how it relates to other emerging architectures, such as [GLA](https://arxiv.org/abs/2312.06635) and [DeltaNet](https://arxiv.org/abs/2406.06484).
 
 # Prerequisite: Traditional Softmax Attention
 
