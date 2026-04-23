@@ -4,6 +4,7 @@ description: "A super cool journey"
 slug: "romobaster"
 date: 2025-03-17 00:00:00+0000
 image: "image.png"
+draft: true
 categories:
     - "Robomaster"
 tags:
