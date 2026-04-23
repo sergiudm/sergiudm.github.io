@@ -1,7 +1,7 @@
 ---
 title: "The Evolution of RWKV (Part 3)"
 date: 2025-04-14 00:00:00+0000
-description: "Introduce RWKV v5 and v6."
+description: "RWKV v5 and v6 Explained."
 tags: 
     - "RWKV"
     - "linear attention"
