@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Thoughts on Qijun's Blog</title><link>https://sergiudm.github.io/tags/thoughts/</link><description>Recent content in Thoughts on Qijun's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 03 Dec 2025 09:00:00 +0000</lastBuildDate><atom:link href="https://sergiudm.github.io/tags/thoughts/index.xml" rel="self" type="application/rss+xml"/><item><title>Time Management: A CS Student's Trial</title><link>https://sergiudm.github.io/p/time-management-a-cs-students-trial/</link><pubDate>Wed, 03 Dec 2025 09:00:00 +0000</pubDate><guid>https://sergiudm.github.io/p/time-management-a-cs-students-trial/</guid><description>&lt;p&gt;There are two kinds of people: those who love planning every detail of their daily lives, and those who prefer to go with the flow, doing whatever feels right in the moment.&lt;/p&gt;
+&lt;p&gt;However, if you look closely, you may find that even the &amp;ldquo;spontaneous&amp;rdquo; types usually have a mental outline of a plan. The reality is that almost everyone working or studying needs a plan; the only difference is that some use tools to help them remember it, while others rely solely on their brains.&lt;/p&gt;
+&lt;p&gt;For those juggling various projects simultaneously, keeping everything in your head is a recipe for disaster. A tool, even just a scratchpad, is necessary to assist you in remembering &lt;em&gt;what&lt;/em&gt; you need to do and &lt;em&gt;when&lt;/em&gt; you need to do it.&lt;/p&gt;
+&lt;p&gt;But for those not used to rigorous planning, it&amp;rsquo;s a tough work to start, or even to keep it going. The key is to make it &lt;strong&gt;simple and frictionless&lt;/strong&gt;. Unfortunately, simplicity often conflicts with the complexity of real life. But wait, what if you are a CS student? Can we leverage the power of code to automate the boring parts while maintaining the capability to handle complex schedules?&lt;/p&gt;
+&lt;p&gt;The answer is yes. After trying numerous ways to manage my time, I finally built a solution that works for me.&lt;/p&gt;
+&lt;h1 id="problems"&gt;Problems
+&lt;/h1&gt;&lt;p&gt;Before introducing my solution, let me summarize the specific problems I faced:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Too many deadlines and small tasks to remember.&lt;/li&gt;
+&lt;li&gt;Wasting time deciding what to do next instead of doing it.&lt;/li&gt;
+&lt;li&gt;Hard to keep track of actual progress versus planned progress.&lt;/li&gt;
+&lt;li&gt;Hard to handle unexpected tasks without ruining the whole schedule.&lt;/li&gt;
+&lt;li&gt;When tasks aren&amp;rsquo;t finished on time, they pile up, leading to anxiety and the &lt;strong&gt;eventual abandonment of the entire plan&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In addition, I want some simple yet useful features:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Habit Tracking:&lt;/strong&gt; Integrated directly into my daily schedule.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Review System:&lt;/strong&gt; Automated weekly/monthly reviews (e.g., working statistics, goal achievement).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Persistent Reminders:&lt;/strong&gt; Notifications that actually force me to take action, rather than ones I just swipe away.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id="the-solution-schedule-everything"&gt;The Solution: &lt;a class="link" href="https://github.com/sergiudm/schedule-everything" target="_blank" rel="noopener"
+&gt;Schedule Everything&lt;/a&gt;
+&lt;/h1&gt;&lt;p&gt;I tried tools like Notion (too manual/heavy), Google Calendar (good for events, bad for routine flows), and Todoist (great list, but lacks the &amp;ldquo;rhythm&amp;rdquo; of a day). None of them fully satisfied my need for a programmable, local, and persistent system.&lt;/p&gt;
+&lt;p&gt;So, I built &lt;strong&gt;Schedule Everything&lt;/strong&gt;. It is a Python-based background service designed for macOS (and Linux) that manages our daily rhythm through configuration files.&lt;/p&gt;
+&lt;p&gt;It consists of three core components:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;The Daemon:&lt;/strong&gt; A lightweight background process (managed by &lt;code&gt;launchd&lt;/code&gt;) that monitors system time.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TOML Configuration:&lt;/strong&gt; Human-readable files where you define your schedule (when it happens) and your settings (what a task is, how long it lasts, how to remind, etc.).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;The CLI:&lt;/strong&gt; A command-line tool (&lt;code&gt;reminder&lt;/code&gt;) to manage ad-hoc tasks, view deadlines, and control the service.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="how-to-use"&gt;How to Use
+&lt;/h2&gt;&lt;p&gt;Getting started is designed to be developer-friendly.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Installation&lt;/strong&gt;
+I wrote an install script that sets up the Python environment and the background service:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git clone https://github.com/sergiudm/schedule-everything.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;./install.sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;2. Configuration&lt;/strong&gt;
+You define your life in &lt;code&gt;~/schedule_management/config/&lt;/code&gt;.
+There are two types time elements:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Time Blocks:&lt;/strong&gt; Reusable chunks of time (e.g., &amp;ldquo;pomodoro&amp;rdquo; = 25 minutes of focused work).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Time Points:&lt;/strong&gt; Specific actions or reminders (e.g., &amp;ldquo;bedtime&amp;rdquo; = &amp;ldquo;Go to sleep! 😴&amp;rdquo;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can define them in &lt;code&gt;settings.toml&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-toml" data-lang="toml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;time_blocks&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;pomodoro&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;25&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;deep_work&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;50&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;break&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;time_points&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nx"&gt;bedtime&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;Go to sleep! 😴&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Then, create your weekly schedule in &lt;code&gt;odd_weeks.toml&lt;/code&gt; and &lt;code&gt;even_weeks.toml&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-toml" data-lang="toml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;monday&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;&amp;#34;09:00&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;deep_work&amp;#34;&lt;/span&gt; &lt;span class="c"&gt;# Starts at 09:00, ends at 09:50&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;&amp;#34;09:50&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;break&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;&amp;#34;10:00&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;deep_work&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;tuesday&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;&amp;#34;10:00&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;pomodoro&amp;#34;&lt;/span&gt; &lt;span class="c"&gt;# Starts at 10:00, ends at 10:25&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;&amp;#34;10:25&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;break&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;common&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s2"&gt;&amp;#34;23:00&amp;#34;&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;bedtime&amp;#34;&lt;/span&gt; &lt;span class="c"&gt;# Applies to every day&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;After setting up your configuration files, the daemon will read them and start the automatic reminders. You&amp;rsquo;ll get notifications at the right times, helping you stay on track.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. The Command Line&lt;/strong&gt;
+I use the CLI to manage tasks that don&amp;rsquo;t fit into the fixed grid:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Add a task with urgency 9 (1-10 scale)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reminder add &lt;span class="s2"&gt;&amp;#34;Finish OS assignment&amp;#34;&lt;/span&gt; &lt;span class="m"&gt;9&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Check task list ranked by urgency&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reminder ls
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Optionally, some urgent tasks will pop up as notifications based on their deadlines&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Mark a task as done&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reminder rm &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="c1"&gt;# where 1 is the task ID from `reminder ls`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Deadlines management&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reminder ddl add &lt;span class="s2"&gt;&amp;#34;Project report&amp;#34;&lt;/span&gt; 12.10 &lt;span class="c1"&gt;# Add a deadline on 12th October&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reminder ddl &lt;span class="c1"&gt;# List upcoming deadlines&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reminder ddl rm &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="c1"&gt;# Remove deadline with ID 2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;[!NOTE]
+For more details, check the &lt;a class="link" href="https://sergiudm.github.io/schedule-everything" target="_blank" rel="noopener"
+&gt;documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;4. Review System&lt;/strong&gt;
+The system automatically generates daily, weekly and monthly reports based on your completed tasks and habits. You can specify where to save these reports in the configuration file.&lt;/p&gt;
+&lt;h2 id="the-principles"&gt;The Principles
+&lt;/h2&gt;&lt;p&gt;Based on my experience, I summarized the following principles for making plans with this system:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Make each task as small and specific as possible (e.g., &amp;ldquo;Refine the introduction of the report&amp;rdquo; instead of &amp;ldquo;Work on the report&amp;rdquo;).&lt;/li&gt;
+&lt;li&gt;Make it easy to see and adjust the plan.&lt;/li&gt;
+&lt;li&gt;Let an external partner to remind and nudge you.&lt;/li&gt;
+&lt;li&gt;Motivate yourself with visible progress.&lt;/li&gt;
+&lt;li&gt;Distinguish between tasks that must be done at a specific time and those that can be done anytime. For the former, the system should send notifications at the right time.&lt;/li&gt;
+&lt;li&gt;For tasks with &lt;code&gt;urgency &amp;gt; 7&lt;/code&gt;, &lt;strong&gt;kill it within before the next day&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id="conclusion"&gt;Conclusion
+&lt;/h1&gt;&lt;p&gt;This system might not be for everyone—if you love drag-and-drop interfaces, stick to Calendar. But if you are a developer who loves the terminal and configuration files, wants full control over their data, and believes that &lt;strong&gt;your schedule is code&lt;/strong&gt;, Schedule Everything might be the tool that perfectly works for you.&lt;/p&gt;</description></item><item><title>休谟法则</title><link>https://sergiudm.github.io/p/%E4%BC%91%E8%B0%9F%E6%B3%95%E5%88%99/</link><pubDate>Thu, 03 Jul 2025 18:00:00 +0000</pubDate><guid>https://sergiudm.github.io/p/%E4%BC%91%E8%B0%9F%E6%B3%95%E5%88%99/</guid><description>&lt;h2 id="1-休谟法则"&gt;1. 休谟法则
+&lt;/h2&gt;&lt;p&gt;任何关于“是什么”的事实，都无法自动推导出关于“应该是什么”的价值。&lt;/p&gt;
+&lt;p&gt;这被称为“休谟法则”或“是-应该问题”（Is-Ought Problem）。举个例子：&lt;/p&gt;
+&lt;p&gt;事实（Is）：演化心理学告诉我们，人类有追求更高社会地位的生物学倾向。&lt;/p&gt;
+&lt;p&gt;这能推导出价值（Ought to be）吗？：这是否意味着“追求社会地位”就是人生的终极意义？我应该把毕生精力都投入到攀比和竞争中吗？&lt;/p&gt;
+&lt;p&gt;我们可以响亮地回答：不！&lt;/p&gt;
+&lt;p&gt;我完全可以认识到我有这种生物倾向（承认我的事实性），然后自由地选择去对抗它。我可以选择成为一个淡泊名利、与世无争的隐士。我也可以选择把这种追求地位的能量，转化到艺术或科学等需要精益求精的创造性领域。&lt;/p&gt;
+&lt;p&gt;是“我”，通过我的自由选择，赋予了我的生物倾向以“意义”。这个倾向本身，并不自带意义。&lt;/p&gt;
+&lt;h3 id="休谟法则的发展"&gt;休谟法则的发展
+&lt;/h3&gt;&lt;h4 id="一人性论中划下的一道鸿沟"&gt;一、《人性论》中划下的一道鸿沟
+&lt;/h4&gt;&lt;p&gt;“休谟法则”源于大卫·休谟（David Hume）在其《人性论》（A Treatise of Human Nature, 1739）中的一段简短但极具颠覆性的观察。&lt;/p&gt;
+&lt;h5 id="原始文本与核心思想"&gt;原始文本与核心思想
+&lt;/h5&gt;&lt;p&gt;休谟注意到，在他读过的所有道德哲学著作中，作者们总是先用一系列“是”（is）或“不是”（is not）的陈述来描述人性或世界（例如，“人性是自私的”、“上帝是存在的”、“社会是建立在契约之上的”）。然后，他们会毫无征兆地、突然地跳转到使用“应该”（ought）或“不应该”（ought not）的陈述，来推导出道德义务或价值判断（例如，“因此，我们应该追求个人利益”、“因此，我们应该服从上帝”、“因此，我们不应该破坏社会契约”）。&lt;/p&gt;
+&lt;p&gt;休谟指出，这种从“是”到“应该”的跳转是不合逻辑的。他认为，一个关于事实的陈述（“是”）和一个关于价值或义务的陈述（“应该”）属于完全不同的领域，你无法仅通过逻辑推理，从前者推导出后者。&lt;/p&gt;
+&lt;p&gt;他的核心论点是： 你无法从纯粹的描述性陈述（关于世界是什么样子）中，逻辑上推导出任何规定性陈述（关于世界应该是什么样子，或者我们应该做什么）。&lt;/p&gt;
+&lt;p&gt;为什么这是一个问题？&lt;/p&gt;
+&lt;p&gt;在休谟之前，大部分伦理学体系都建立在某种“事实”之上：&lt;/p&gt;
+&lt;p&gt;古希腊哲学家（如亚里士多德）从“人的本性是什么”推导出“人应该如何过上繁盛的生活”。&lt;/p&gt;
+&lt;p&gt;宗教伦理学从“上帝的旨意是什么”推导出“人应该遵守什么戒律”。&lt;/p&gt;
+&lt;p&gt;自然法理论家从“自然的秩序是什么”推导出“人应该遵循什么法则”。&lt;/p&gt;
+&lt;p&gt;休谟的发现，像一把利刃，斩断了“事实”与“价值”之间的逻辑锁链。如果他是对的，那么所有这些伦理学体系的基础都动摇了。道德似乎成了一座“空中楼阁”，无法被牢固地锚定在客观事实上。&lt;/p&gt;
+&lt;h4 id="二-后续哲学家的回应与争论试图跨越鸿沟"&gt;二、 后续哲学家的回应与争论：试图跨越鸿沟
+&lt;/h4&gt;&lt;p&gt;休谟划下的这道鸿沟，让后来的哲学家们无法忽视。他们或试图加固这道鸿沟，或试图搭建桥梁跨越它。&lt;/p&gt;
+&lt;h5 id="康德加固鸿沟另辟蹊径"&gt;康德：加固鸿沟，另辟蹊径
+&lt;/h5&gt;&lt;p&gt;康德深受休谟的影响，他承认无法从经验世界（“是”）中推导出普适的道德法则。但他并未因此放弃道德的客观性。&lt;/p&gt;
+&lt;p&gt;他的方案：康德将道德的基础从外部的“事实世界”转移到了内部的“纯粹理性”本身。他认为，道德法则（“应该”）不依赖于经验观察，而是源于理性主体为自己立法的能力。他的“绝对命令”（Categorical Imperative）——如“你的行为准则，应该能同时成为一条普遍的法则”——是一个纯粹形式化的、先验的理性原则，不依赖于任何特定的事实。&lt;/p&gt;
+&lt;p&gt;演进：康德实际上是绕过了“是-应该问题”。他同意“是”无法推导出“应该”，但他认为“应该”可以由纯粹理性独立生成。&lt;/p&gt;
+&lt;h5 id="功利主义utilitarianism试图用幸福搭桥"&gt;功利主义（Utilitarianism）：试图用“幸福”搭桥
+&lt;/h5&gt;&lt;p&gt;以边沁（Jeremy Bentham）和约翰·斯图亚特·密尔（John Stuart Mill）为代表的功利主义者，试图重新连接事实与价值。&lt;/p&gt;
+&lt;p&gt;他们的方案：他们从一个心理学事实出发：“人性是趋乐避苦的”（是）。然后他们从中推导出道德原则：“行为的对错，取决于其能否最大化地增进最多数人的幸福（快乐）”（应该）。&lt;/p&gt;
+&lt;p&gt;面临的挑战：批评者会立即用休谟法则来反驳：即便所有人都事实上在追求快乐，这在逻辑上也不能证明追求快乐就是道德上正确或应该做的事。也许人应该追求比快乐更高尚的东西，比如真理或美德，哪怕过程是痛苦的。&lt;/p&gt;
+&lt;h5 id="ge-摩尔g-e-moore与自然主义谬误"&gt;G.E. 摩尔（G. E. Moore）与“自然主义谬误”
+&lt;/h5&gt;&lt;p&gt;20世纪初，分析哲学家G.E.摩尔提出了一个与休谟法则密切相关的概念：“自然主义谬误”（Naturalistic Fallacy）。&lt;/p&gt;
+&lt;p&gt;核心思想：摩尔认为，“善”（Good）是一种单纯的、不可分析的、非自然的属性。任何试图用某种自然属性（如“快乐的”、“能促进进化的”、“符合人性的”）来定义“善”的企图，都是在犯逻辑错误。&lt;/p&gt;
+&lt;p&gt;与休谟法则的关系：“自然主义谬误”可以看作是“是-应该问题”在语义学上的版本。休谟说你不能从事实推导出价值，摩尔说你甚至不能用事实定义价值。&lt;/p&gt;
+&lt;p&gt;演进：摩尔极大地强化了事实与价值之间的鸿沟，影响了20世纪大部分英美分析哲学，使得“元伦理学”（研究道德语言和概念的学科）蓬勃发展。许多哲学家（如A.J.艾耶尔的情感主义）认为，道德陈述根本不是在描述事实，而只是在表达情感或命令。&lt;/p&gt;
+&lt;h4 id="三-现代的尝试更精致的搭桥方案"&gt;三、 现代的尝试：更精致的搭桥方案
+&lt;/h4&gt;&lt;p&gt;20世纪下半叶以来，哲学家们不满足于让事实与价值永远分离，发展出了一些更复杂的理论，试图以新的方式连接“是”与“应该”。&lt;/p&gt;
+&lt;h5 id="约翰塞尔john-searle的制度性事实"&gt;约翰·塞尔（John Searle）的“制度性事实”
+&lt;/h5&gt;&lt;p&gt;美国哲学家约翰·塞尔提出了一个著名的反例。&lt;/p&gt;
+&lt;p&gt;他的方案：他认为可以从一个纯粹的事实陈述，通过一系列“制度性事实”，推导出一个“应该”陈述。&lt;/p&gt;
+&lt;p&gt;事实1：琼斯说了这句话：“我谨此承诺付给你，史密斯，五美元。”（这是一个纯粹的物理声音事件）&lt;/p&gt;
+&lt;p&gt;制度性事实2：在特定条件下，说出这句话就构成了“承诺”。（“承诺”是一个社会制度）&lt;/p&gt;
+&lt;p&gt;制度性事实3：承诺产生了履行的义务。&lt;/p&gt;
+&lt;p&gt;结论（应该）：因此，琼斯应该付给史密斯五美元。&lt;/p&gt;
+&lt;p&gt;争议：这个论证是否成功，至今仍在争论。批评者认为，步骤3（承诺产生义务）本身已经偷偷地包含了一个“应该”的预设，即我们“应该”遵守“承诺”这个社会制度。&lt;/p&gt;
+&lt;h5 id="菲利帕福特philippa-foot与新亚里士多德主义"&gt;菲利帕·福特（Philippa Foot）与新亚里士多德主义
+&lt;/h5&gt;&lt;p&gt;像福特和阿拉斯代尔·麦金泰尔（Alasdair MacIntyre）等哲学家，试图复兴亚里士多德的伦理学。&lt;/p&gt;
+&lt;p&gt;他们的方案：他们认为，对于有“功能”或“目的”的生物或事物来说，“是”与“应该”是内在相关的。&lt;/p&gt;
+&lt;p&gt;例子：从“这是一棵橡树的树根”（是）这个事实，我们可以推断出“它应该要能深入土壤、吸收水分”（应该），因为这就是一个“好”的树根的功能。&lt;/p&gt;
+&lt;p&gt;他们将此应用到人身上：如果我们能确定人的功能或目的（telos）是什么（例如，过上理性而繁盛的生活），我们就能从“人是什么”推导出“人应该做什么”。&lt;/p&gt;
+&lt;p&gt;挑战：这种方法的关键困难在于，现代科学世界观下，很难再说人有一个像“树根”那样客观的、单一的“功能”或“目的”。这又回到了我们之前讨论的萨特所反对的“预设本质”。&lt;/p&gt;
+&lt;h5 id="科学自然主义scientific-naturalism"&gt;科学自然主义（Scientific Naturalism）
+&lt;/h5&gt;&lt;p&gt;一些当代哲学家，如神经科学家萨姆·哈里斯（Sam Harris），认为科学可以回答道德问题。&lt;/p&gt;
+&lt;p&gt;他的方案：他将“善”定义为“有意识生物的福祉”（the well-being of conscious creatures）。这是一个事实领域的问题，可以通过神经科学、心理学等来研究。&lt;/p&gt;
+&lt;p&gt;面临的挑战：这同样面临“自然主义谬误”的指控。为什么我们应该把“善”就等同于“福祉”？这个最初的定义本身就是一个价值预设，而不是科学发现。&lt;/p&gt;</description></item><item><title>理想的科研状态</title><link>https://sergiudm.github.io/p/%E7%90%86%E6%83%B3%E7%9A%84%E7%A7%91%E7%A0%94%E7%8A%B6%E6%80%81/</link><pubDate>Wed, 19 Feb 2025 09:00:00 +0000</pubDate><guid>https://sergiudm.github.io/p/%E7%90%86%E6%83%B3%E7%9A%84%E7%A7%91%E7%A0%94%E7%8A%B6%E6%80%81/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;24年10月准备冲ICML，一路磕磕碰碰到DDL，还是没能跑出任何拿得出手的数据。
+经此一役，我意识到，科研的理想状态并不是“有一个很好的想法，就能把它实现”。于是，本着learning from errors的精神，写下这篇文章，记录一些我在科研过程中总结的经验教训。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id="0心态你的时间并不那么紧迫"&gt;0.心态：你的时间并不那么紧迫
+&lt;/h1&gt;&lt;p&gt;即便冲会议，“冲会议”这个念头也应当放在战略层面，而非心态层面。
+如果一开始就以“时间很紧啊”“要有点紧迫感啊”来鞭策自己以及组员，就很容易陷入“着急忙慌改model，每天急切地期望它涨点，可是每天都不涨”的困境。
+再着急的会议也不是一天两天的事，况且很多时候大家也并非专门瞄着某个会，非它不可。所以心态上一定不能急躁，不要想着赶紧把实验跑起来然后随便一改就涨点了。
+另外，摈弃”只有写运行代码才是有用功“的思维。
+以前我也喜欢在一些小问题上囫囵吞枣，草草看paper，懒得写注释，命名随意······这些都在无形中增大项目的管理难度，越到后期问题越多。&lt;/p&gt;
+&lt;h1 id="1调研学习baseline"&gt;1.调研&amp;amp;学习baseline
+&lt;/h1&gt;&lt;p&gt;这是对我上次失败contribute最直接的一项。如果一开始老老实实把所有模棱两可的疑点弄明白，后期将会节省大量时间。有些事情确实应该边做边学，边做边找问题，但至少对于当前工作的核心部分，基本的原理必须吃透。
+所谓吃透，就是达到面试级别的掌握程度。如果只是看了几篇博客就觉得可以开工，那么很可能遗漏各种细节和知识。而那些遗漏的细节将会在一次次实验中暴露，浪费大量时间；那些似是而非的知识，后期会学习一遍又一遍，还是似是而非。&lt;/p&gt;
+&lt;h1 id="2时间管理"&gt;2.时间管理
+&lt;/h1&gt;&lt;p&gt;可以没有非常fine-grain的时间安排，但至少要有战略性的规划，要在项目开始前明确应该分几个阶段，要做哪些事，大概按照什么顺序开展，耗时大概多久。
+写周报或日报。可以自己写也可以督促大家一起写。记录每天的收获和工作。这样可以避免陷入某个局部浑浑噩噩度过好多天才惊觉。&lt;/p&gt;
+&lt;h1 id="3代码管理"&gt;3.代码管理
+&lt;/h1&gt;&lt;p&gt;如果有多台机器，如果有多个集群共用一个跳板机的情况，不要用分支，直接写多个model.py，否则log不好同步。
+实验结果全部记录在一份组里共同可见的文档中。
+log命名一定要清楚，不要以为自己记得住（也可以带上日期以便和日报对应上）。
+ckpt命名最好和log一致，便于后续做分析。
+注释一定要写。一般大家的commit记录都乱七八糟，所以最好在注释末尾加日期，这样你只要一对照日报就能知道这是什么时候改的。&lt;/p&gt;
+&lt;h1 id="4实验管理"&gt;4.实验管理
+&lt;/h1&gt;&lt;p&gt;跑实验前把baseline所有的config项都看一遍（很可能出现一些似是而非的参数，是baseline用来跑ablation study的，一定不能马虎）
+注意可复现性，如果在不同的机器跑，最好在每个机子上都跑一遍baseline。
+一定要有分析模型和实验结果的方法，不要靠简简单单的一个metric来猜测一切。要想好怎么分析自己的改动，如何可视化，这对于写paper也很有帮助。&lt;/p&gt;
+&lt;h1 id="5精神"&gt;5.精神
+&lt;/h1&gt;&lt;p&gt;人总会不开心，甚至会丧失信心，大家都是如此。
+在面对挫折时，如果信奉”英雄不是不会跌倒，而是哪怕跌倒了都能恢复“，那么还是停留在鸡汤层面。咱们做机器学习的，应该相信挫折即知识。也许自己的初始位置不够好，但是通过足够多的错误和挫折，我们能学习到足够多的教训。越珍惜挫折就进步得越快。
+当然，人不像机器那样孜孜不倦地“学习”，并且，人遇到错误都会难过，因此，保持良好的精神状态也许更重要。累了就休息，效率太低就暂时放空两天。一定要警惕浑浑噩噩，感觉每天都在忙碌实则虚度光阴（写日报一定程度能避免这个情况）。&lt;/p&gt;
+&lt;h1 id="6其它"&gt;6.其它
+&lt;/h1&gt;&lt;p&gt;TBD&lt;/p&gt;</description></item></channel></rss>
