@@ -5,7 +5,7 @@ description: "This is a series of posts about the RWKV architecture (From v4 to 
 image: "imagecopy.png"
 categories:
     - "RWKV"
-draft: false
+draft: true
 tags:
     - "RWKV"
     - "RNN"
