@@ -1,0 +1,9 @@
+- name: Schedule Everything
+  description: "A local-first weekly routine, task list, and focus-block reminder app. Your AI agent plans the week; persistent reminders keep you on it."
+  url: "https://github.com/AutoPhd-org/schedule-everything"
+  post: "/p/time-management/"
+  tags: ["Rust", "TypeScript", "Agent plugin"]
+- name: Thread Everything
+  description: "Making communication between different machines easier."
+  url: "https://github.com/sergiudm/Thread-Everything"
+  tags: ["Networking"]

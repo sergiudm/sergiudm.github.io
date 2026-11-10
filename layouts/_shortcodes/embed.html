@@ -1,0 +1,10 @@
+{{- /*
+  {{< embed src="https://www.youtube-nocookie.com/embed/ID" title="..." ratio="16/9" caption="..." size="wide" >}}
+  Any iframe: videos, notebooks, interactive demos, slides. Use height="480" for a fixed height.
+*/ -}}
+<figure class="embed {{ .Get "size" }}">
+  <div class="embed__frame" style="{{ with .Get "height" }}height: {{ . }}px{{ else }}aspect-ratio: {{ $.Get "ratio" | default "16/9" }}{{ end }}">
+    <iframe src="{{ .Get "src" }}" title="{{ .Get "title" | default "Embedded content" }}" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
+  </div>
+  {{- with .Get "caption" }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end }}
+</figure>

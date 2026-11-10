@@ -1,0 +1,13 @@
+{{- /* Table of contents built from the page's headings, relative to its top heading level. */ -}}
+{{- $hs := partial "toc-collect.html" .Fragments.Headings -}}
+{{- if ge (len $hs) 3 -}}
+  {{- $min := 6 }}{{ range $hs }}{{ if lt .level $min }}{{ $min = .level }}{{ end }}{{ end -}}
+<nav class="toc" aria-label="Contents">
+  <p class="toc__title">Contents</p>
+  <ol class="toc__list">
+    {{- range $hs }}{{ $d := sub .level $min }}{{ if le $d 1 }}
+    <li class="toc__item toc__item--d{{ $d }}"><a href="#{{ .id }}">{{ .title | plainify | htmlUnescape }}</a></li>
+    {{- end }}{{ end }}
+  </ol>
+</nav>
+{{- end -}}

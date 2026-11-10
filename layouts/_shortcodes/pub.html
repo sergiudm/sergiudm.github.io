@@ -1,0 +1,7 @@
+{{- /* {{< pub "vlaa-gui" >}} — embed a publication card from data/publications.yaml. */ -}}
+{{- $id := .Get 0 | default (.Get "id") -}}
+{{- range where hugo.Data.publications "id" $id -}}
+<div class="pub-embed">{{ partial "pub-entry.html" (dict "pub" . "compact" true) }}</div>
+{{- else -}}
+{{- warnf "pub shortcode: no publication with id %q (%s)" $id .Position -}}
+{{- end -}}

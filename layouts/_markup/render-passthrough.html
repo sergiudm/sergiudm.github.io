@@ -1,0 +1,10 @@
+{{- /* LaTeX math rendered to HTML at build time with KaTeX. */ -}}
+{{- $opts := dict "output" "htmlAndMathml" "displayMode" (eq .Type "block") "throwOnError" false -}}
+{{- with try (transform.ToMath .Inner $opts) -}}
+  {{- with .Err -}}
+    {{- warnf "Could not render math in %s: %s" $.Page.File.Path . -}}
+    <code class="math-error">{{ $.Inner }}</code>
+  {{- else -}}
+    {{- if eq $.Type "block" }}<div class="math-display">{{ .Value }}</div>{{ else }}{{ .Value }}{{ end -}}
+  {{- end -}}
+{{- end -}}

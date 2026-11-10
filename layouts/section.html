@@ -1,0 +1,54 @@
+{{ define "main" }}
+{{- if eq .Section "publications" }}
+  {{- partial "publications-page.html" . }}
+{{- else }}
+<div class="container container--narrow">
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+    {{- with .Content }}<div class="page-intro">{{ . }}</div>{{ end }}
+  </header>
+
+  {{- with site.Taxonomies.series }}
+  <div class="series-cards">
+    {{- range .ByCount }}
+      {{- $pages := .Pages.ByDate }}
+      {{- $first := index $pages 0 }}
+    <a class="series-card" href="{{ $first.RelPermalink }}">
+      <span class="series-card__kicker">{{ partial "icon.html" "layers" }} Series · {{ .Count }} parts</span>
+      <strong class="series-card__name">{{ .Page.LinkTitle }}</strong>
+      <span class="series-card__desc">{{ with .Page.Description }}{{ . }}{{ else }}{{ with $first.Description }}{{ . }}{{ end }}{{ end }}</span>
+      <span class="series-card__cta">Start with part 1 {{ partial "icon.html" "arrow-right" }}</span>
+    </a>
+    {{- end }}
+  </div>
+  {{- end }}
+
+  {{- /* Search and category filters only pay off once there are a few posts. */}}
+  {{- if ge (len .Pages) 5 }}
+  <div class="filter" data-filter>
+    <label class="filter__search">
+      {{ partial "icon.html" "search" }}
+      <span class="visually-hidden">Search posts</span>
+      <input type="search" placeholder="Search posts" autocomplete="off" data-filter-input>
+    </label>
+    <div class="filter__chips" role="group" aria-label="Filter by category">
+      <button type="button" class="chip is-active" data-filter-cat="" aria-pressed="true">All <span>{{ len .Pages }}</span></button>
+      {{- range site.Taxonomies.categories.ByCount }}
+      <button type="button" class="chip" data-filter-cat="{{ .Name }}" aria-pressed="false">{{ .Page.LinkTitle }} <span>{{ .Count }}</span></button>
+      {{- end }}
+    </div>
+  </div>
+  {{- end }}
+
+  {{- range .Pages.GroupByDate "2006" }}
+  <section class="year-group" data-year-group>
+    <h2 class="year-group__year">{{ .Key }}</h2>
+    <ul class="post-list">
+      {{- range .Pages }}{{ partial "post-item.html" (dict "page" .) }}{{ end }}
+    </ul>
+  </section>
+  {{- end }}
+  <p class="filter__empty" data-filter-empty hidden>No posts match that search.</p>
+</div>
+{{- end }}
+{{ end }}

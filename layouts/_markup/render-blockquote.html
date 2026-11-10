@@ -1,0 +1,28 @@
+{{- /*
+  GitHub-style alerts become callouts:
+    > [!NOTE] / [!TIP] / [!IMPORTANT] / [!WARNING] / [!CAUTION]
+    > [!TIP] Custom title        (a title after the marker)
+    > [!NOTE]-                   (collapsed; "+" for expanded)
+  Plain blockquotes stay blockquotes; `> text {.pull}` makes a pull quote.
+*/ -}}
+{{- if eq .Type "alert" -}}
+  {{- $type := lower .AlertType -}}
+  {{- $known := slice "note" "tip" "important" "warning" "caution" -}}
+  {{- if not (in $known $type) }}{{ $type = "note" }}{{ end -}}
+  {{- $title := .AlertTitle | default (title $type) -}}
+  {{- if .AlertSign -}}
+<details class="callout callout--{{ $type }}"{{ if eq .AlertSign "+" }} open{{ end }}>
+  <summary class="callout__title">{{ partial "icon.html" $type }}<span>{{ $title }}</span>{{ partial "icon.html" "chevron-down" }}</summary>
+  <div class="callout__body">{{ .Text }}</div>
+</details>
+  {{- else -}}
+<aside class="callout callout--{{ $type }}">
+  <p class="callout__title">{{ partial "icon.html" $type }}<span>{{ $title }}</span></p>
+  <div class="callout__body">{{ .Text }}</div>
+</aside>
+  {{- end -}}
+{{- else -}}
+<blockquote{{ with .Attributes.class }} class="{{ . }}"{{ end }}>
+  {{ .Text }}
+</blockquote>
+{{- end -}}

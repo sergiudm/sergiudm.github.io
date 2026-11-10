@@ -1,0 +1,29 @@
+{{- /*
+  {{< terminal title="zsh" >}}
+  $ rmd status
+  output line
+  # a comment
+  {{< /terminal >}}
+  Lines starting with the prompt ("$ " by default) are commands; Copy copies only those.
+*/ -}}
+{{- $prompt := printf "%s " (.Get "prompt" | default "$") -}}
+{{- $lines := split (strings.TrimRight " \n\t" (strings.TrimLeft "\n" .Inner)) "\n" -}}
+<figure class="terminal {{ .Get "size" }}">
+  <div class="terminal__bar">
+    <span class="terminal__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="terminal__title">{{ .Get "title" | default "Terminal" }}</span>
+    <button class="copy-btn" type="button" data-copy-commands aria-label="Copy commands">{{ partial "icon.html" "copy" }}<span>Copy</span></button>
+  </div>
+  <pre class="terminal__body"><code>
+    {{- range $lines -}}
+      {{- if strings.HasPrefix . $prompt -}}
+        <span class="term-line term-cmd"><span class="term-prompt" aria-hidden="true">{{ $prompt }}</span><span class="term-input">{{ strings.TrimPrefix $prompt . }}</span></span>
+      {{- else if strings.HasPrefix . "# " -}}
+        <span class="term-line term-comment">{{ . }}</span>
+      {{- else -}}
+        <span class="term-line term-out">{{ . }}</span>
+      {{- end }}
+{{ end -}}
+  </code></pre>
+  {{- with .Get "caption" }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end }}
+</figure>

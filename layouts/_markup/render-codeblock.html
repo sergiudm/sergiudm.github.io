@@ -1,0 +1,11 @@
+{{- /* Code blocks with a language label (or ```lang {title="file.toml"}), and a copy button. */ -}}
+{{- $lang := .Type | default "text" -}}
+{{- $label := .Attributes.title | default $lang -}}
+{{- $result := transform.HighlightCodeBlock . -}}
+<div class="codeblock{{ with .Attributes.class }} {{ . }}{{ end }}" data-lang="{{ $lang }}">
+  <div class="codeblock__bar">
+    <span class="codeblock__label">{{ if .Attributes.title }}{{ partial "icon.html" "code" }}{{ end }}{{ $label }}</span>
+    <button class="copy-btn" type="button" aria-label="Copy code">{{ partial "icon.html" "copy" }}<span>Copy</span></button>
+  </div>
+  {{ $result.Wrapped }}
+</div>

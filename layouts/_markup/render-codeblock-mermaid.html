@@ -1,0 +1,5 @@
+{{- /* ```mermaid {caption="..." class="wide"} — rendered in the browser, following the site theme. */ -}}
+<figure class="diagram{{ with .Attributes.class }} {{ . }}{{ end }}">
+  <div class="mermaid" data-source="{{ .Inner }}" role="img" aria-label="{{ .Attributes.alt | default .Attributes.caption | default "Diagram" }}"><pre class="mermaid__fallback">{{ .Inner }}</pre></div>
+  {{- with .Attributes.caption }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end }}
+</figure>

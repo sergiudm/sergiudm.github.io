@@ -28,15 +28,12 @@ jobs:
                   path: resources
                   key: ${{ env.cache-name }}
 
-            - uses: actions/setup-go@v5
-              with:
-                  go-version: "^1.17.0"
-            - run: go version
-
+            # The theme lives in this repository (layouts/, assets/), so no Go or Hugo modules are needed.
+            # Pinned so a new Hugo release can't change the build unexpectedly; the templates need 0.158 or newer.
             - name: Setup Hugo
               uses: peaceiris/actions-hugo@v2
               with:
-                  hugo-version: "latest"
+                  hugo-version: "0.169.0"
                   extended: true
 
             - name: Build

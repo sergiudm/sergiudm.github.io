@@ -1,0 +1,33 @@
+baseURL = "https://sergiudm.github.io/"
+locale = "en-US"
+title = "Qijun Han"
+defaultContentLanguage = "en"
+
+# Counts CJK characters correctly for reading time and summaries (several posts are in Chinese).
+hasCJKLanguage = true
+enableRobotsTXT = true
+summaryLength = 40
+
+[pagination]
+pagerSize = 50
+
+[taxonomies]
+category = "categories"
+tag = "tags"
+series = "series"
+
+[outputs]
+home = ["html", "rss"]
+section = ["html", "rss"]
+taxonomy = ["html"]
+term = ["html", "rss"]
+
+[services.rss]
+limit = 30
+
+[imaging]
+
+resampleFilter = "lanczos"
+
+[imaging.webp]
+quality = 82

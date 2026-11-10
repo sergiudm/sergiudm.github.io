@@ -1,0 +1,7 @@
+# Newest first. `text` is Markdown.
+- date: 2026-11-10
+  text: "Rewrote my [time-management post](/p/time-management/) for the new Schedule Everything: one Rust binary, agent-planned days, and a browser workspace."
+- date: 2026-09-24
+  text: "Updated **VLAA-GUI** on [arXiv](https://arxiv.org/abs/2604.21375) (v3)."
+- date: 2026-04-23
+  text: "**VLAA-GUI** is on [arXiv](https://arxiv.org/abs/2604.21375), with a [project page](https://ucsc-vlaa.github.io/VLAA-GUI/): 77.5% on OSWorld and 61.0% on WindowsAgentArena, with three of five backbones above human performance on OSWorld."

@@ -1,0 +1,16 @@
+{{- $cur := . -}}
+{{- with .GetTerms "series" -}}
+  {{- $term := index . 0 -}}
+  {{- $pages := $term.Pages.ByDate -}}
+  {{- $idx := 0 -}}
+  {{- range $i, $p := $pages }}{{ if eq $p.RelPermalink $cur.RelPermalink }}{{ $idx = add $i 1 }}{{ end }}{{ end -}}
+<aside class="series" aria-label="Series">
+  <p class="series__kicker">{{ partial "icon.html" "layers" }} Series · Part {{ $idx }} of {{ len $pages }}</p>
+  <a class="series__name" href="{{ $term.RelPermalink }}">{{ $term.LinkTitle }}</a>
+  <ol class="series__list">
+    {{- range $pages }}
+    <li{{ if eq .RelPermalink $cur.RelPermalink }} aria-current="page"{{ end }}><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+    {{- end }}
+  </ol>
+</aside>
+{{- end -}}

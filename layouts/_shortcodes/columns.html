@@ -1,0 +1,13 @@
+{{- /*
+  {{< columns size="wide" >}}
+  Left column (Markdown)
+  <--->
+  Right column (Markdown)
+  {{< /columns >}}
+*/ -}}
+{{- $parts := split .Inner "<--->" -}}
+<div class="columns {{ .Get "size" }}" style="--cols: {{ len $parts }}">
+  {{- range $parts }}
+  <div class="columns__col">{{ . | $.Page.RenderString (dict "display" "block") }}</div>
+  {{- end }}
+</div>

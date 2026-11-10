@@ -1,0 +1,19 @@
+{{- /*
+  ![alt](src "caption"){.wide}  →  a responsive <figure> with a caption.
+  Classes after the image (block images only): .wide, .full, .narrow, .bordered, .no-zoom
+*/ -}}
+{{- $u := urls.Parse .Destination -}}
+{{- $res := false -}}
+{{- if not $u.IsAbs -}}
+  {{- with .Page.Resources.Get $u.Path -}}{{ $res = . }}{{- else -}}{{ with resources.Get $u.Path }}{{ $res = . }}{{ end }}{{- end -}}
+{{- end -}}
+{{- $class := .Attributes.class | default "" -}}
+{{- $zoom := not (in $class "no-zoom") -}}
+{{- if .IsBlock -}}
+<figure class="figure {{ $class }}">
+  {{- partial "img.html" (dict "res" $res "src" .Destination "alt" .PlainText "zoom" $zoom) -}}
+  {{- with .Title }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end -}}
+</figure>
+{{- else -}}
+  {{- partial "img.html" (dict "res" $res "src" .Destination "alt" .PlainText "zoom" false "class" "inline-img") -}}
+{{- end -}}

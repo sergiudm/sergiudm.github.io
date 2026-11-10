@@ -1,0 +1,12 @@
+{{- /*
+  {{< demo title="Try it" caption="..." size="wide" >}}
+    <raw HTML, CSS and <script>…</script>>
+  {{< /demo >}}
+  A framed, theme-aware area for interactive widgets written right in the post.
+  Use the site's CSS variables (var(--accent), var(--surface), …) so it follows dark mode.
+*/ -}}
+<figure class="demo {{ .Get "size" }}{{ with .Get "class" }} {{ . }}{{ end }}">
+  {{- with .Get "title" }}<div class="demo__bar"><span class="demo__badge">{{ partial "icon.html" "spark" }}Interactive</span><span class="demo__title">{{ . }}</span></div>{{ end }}
+  <div class="demo__body">{{ .Inner | safeHTML }}</div>
+  {{- with .Get "caption" }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end }}
+</figure>

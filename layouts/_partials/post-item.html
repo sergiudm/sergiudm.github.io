@@ -1,0 +1,28 @@
+{{- /* One row in a post list. Context: dict "page" <page> "datefmt" <layout> "thumb" bool */ -}}
+{{- $p := .page -}}
+{{- $fmt := .datefmt | default "Jan 2" -}}
+{{- $cats := $p.Params.categories | default slice -}}
+{{- $tags := $p.Params.tags | default slice -}}
+<li class="post-item" data-search="{{ lower (printf "%s %s %s %s" $p.Title ($p.Description | default "") (delimit $cats " ") (delimit $tags " ")) }}" data-cats="|{{ delimit (apply $cats "urlize" ".") "|" }}|">
+  <time class="post-item__date" datetime="{{ $p.Date.Format "2006-01-02" }}">{{ $p.Date.Format $fmt }}</time>
+  <div class="post-item__main">
+    <h3 class="post-item__title"><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+      {{- if eq $p.Params.language "zh" }} <span class="badge badge--lang" lang="zh">中文</span>{{ end }}
+      {{- with $p.Params.link }} <span class="badge">project</span>{{ end }}
+    </h3>
+    {{- with $p.Description }}<p class="post-item__desc">{{ . }}</p>{{ end }}
+    <p class="post-item__meta">
+      {{- with $p.GetTerms "series" }}{{ range first 1 . }}<span class="post-item__series">{{ partial "icon.html" "layers" }}{{ .LinkTitle }}</span>{{ end }}{{ end }}
+      {{- range first 2 ($p.GetTerms "categories") }}<span>{{ .LinkTitle }}</span>{{ end }}
+      <span>{{ $p.ReadingTime }} min read</span>
+    </p>
+  </div>
+  {{- if ne .thumb false }}
+    {{- with partial "cover.html" $p }}
+      {{- if and (eq .MediaType.MainType "image") (ne .MediaType.SubType "svg") }}
+      {{- $t := .Fill "320x200 webp Smart" }}
+  <a class="post-item__thumb" href="{{ $p.RelPermalink }}" tabindex="-1" aria-hidden="true"><img src="{{ $t.RelPermalink }}" width="160" height="100" alt="" loading="lazy" decoding="async"></a>
+      {{- end }}
+    {{- end }}
+  {{- end }}
+</li>

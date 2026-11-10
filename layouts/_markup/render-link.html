@@ -1,0 +1,8 @@
+{{- $u := urls.Parse .Destination -}}
+{{- $href := .Destination -}}
+{{- if and (not $u.IsAbs) (not (strings.HasPrefix .Destination "#")) (not (strings.HasPrefix .Destination "/")) -}}
+  {{- with .Page.GetPage (strings.TrimSuffix "/" $u.Path) }}{{ $href = printf "%s%s" .RelPermalink (cond (ne $u.Fragment "") (printf "#%s" $u.Fragment) "") }}{{ end -}}
+{{- end -}}
+{{- $external := and $u.IsAbs (not (strings.HasPrefix .Destination site.BaseURL)) -}}
+<a href="{{ $href | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if $external }} rel="noopener"{{ end }}>{{ .Text }}</a>
+{{- /* no trailing newline */ -}}

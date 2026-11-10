@@ -1,0 +1,66 @@
+{{- /*
+  A day (or any span) laid out on a time axis, one row per kind.
+  {{< timeline start="07:00" end="24:00" title="A Tuesday" caption="..." size="wide" >}}
+  08:30-09:20 | potato | focus
+  13:20       | napping | reminder
+  {{< /timeline >}}
+  Each line: "HH:MM[-HH:MM] | label | kind". Ranges draw bars; single times draw markers.
+*/ -}}
+{{- $start := partial "time-to-min.html" (.Get "start" | default "06:00") -}}
+{{- $end := partial "time-to-min.html" (.Get "end" | default "24:00") -}}
+{{- $span := sub $end $start -}}
+{{- $items := slice -}}
+{{- $kinds := slice -}}
+{{- range split (strings.TrimSpace .Inner) "\n" -}}
+  {{- $line := strings.TrimSpace . -}}
+  {{- if $line -}}
+    {{- $f := split $line "|" -}}
+    {{- $when := strings.TrimSpace (index $f 0) -}}
+    {{- $label := "" -}}
+    {{- if ge (len $f) 2 }}{{ $label = strings.TrimSpace (index $f 1) }}{{ end -}}
+    {{- $kind := "event" -}}
+    {{- if ge (len $f) 3 }}{{ $kind = strings.TrimSpace (index $f 2) }}{{ end -}}
+    {{- $t := split $when "-" -}}
+    {{- $s := partial "time-to-min.html" (index $t 0) -}}
+    {{- $e := -1 -}}
+    {{- if ge (len $t) 2 }}{{ $e = partial "time-to-min.html" (index $t 1) }}{{ end -}}
+    {{- $items = $items | append (dict "s" $s "e" $e "label" $label "kind" $kind "when" (replace $when "-" "–")) -}}
+    {{- if not (in $kinds $kind) }}{{ $kinds = $kinds | append $kind }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- $step := cond (gt $span 720) 120 60 -}}
+<figure class="timeline {{ .Get "size" }}">
+  {{- with .Get "title" }}<p class="timeline__title">{{ . }}</p>{{ end }}
+  {{- $first := int (mul (math.Ceil (div (float $start) $step)) $step) }}
+  {{- $ticks := seq $first $step $end }}
+  <div class="timeline__grid">
+    <div class="timeline__lines" aria-hidden="true">
+      {{- range $ticks }}<span style="left: {{ printf "%.3f" (div (mul (sub . $start) 100.0) $span) }}%"></span>{{ end -}}
+    </div>
+    {{- range $ki, $kind := $kinds }}
+    <div class="timeline__row" style="--c: var(--series-{{ add (mod $ki 6) 1 }})">
+      <span class="timeline__kind">{{ $kind }}</span>
+      <div class="timeline__track">
+        {{- range $items }}{{ if eq .kind $kind }}
+          {{- $left := div (mul (sub .s $start) 100.0) $span }}
+          {{- if ge .e 0 }}
+            {{- $w := div (mul (sub .e .s) 100.0) $span }}
+        <span class="timeline__bar" tabindex="0" style="left: {{ printf "%.3f" $left }}%; width: {{ printf "%.3f" $w }}%" data-tip="{{ .when }} · {{ .label }}"><span>{{ .label }}</span></span>
+          {{- else }}
+        <span class="timeline__point" tabindex="0" style="left: {{ printf "%.3f" $left }}%" data-tip="{{ .when }} · {{ .label }}"></span>
+          {{- end }}
+        {{- end }}{{ end }}
+      </div>
+    </div>
+    {{- end }}
+    <div class="timeline__axis" aria-hidden="true">
+      <span class="timeline__kind"></span>
+      <div class="timeline__track">
+        {{- range $ticks }}
+        <span class="timeline__tick" style="left: {{ printf "%.3f" (div (mul (sub . $start) 100.0) $span) }}%">{{ printf "%02d" (div . 60) }}:{{ printf "%02d" (mod . 60) }}</span>
+        {{- end }}
+      </div>
+    </div>
+  </div>
+  {{- with .Get "caption" }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end }}
+</figure>

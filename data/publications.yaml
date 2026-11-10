@@ -1,0 +1,80 @@
+# Publications, newest first. Add a new entry at the top.
+#
+# authors:   list names exactly as they should appear; add "*" for equal contribution.
+#            Your own name (params.author.name) is highlighted automatically.
+# teaser:    the name of an SVG partial in layouts/_partials/teasers/ (no extension),
+#            or an image path under assets/ (e.g. "img/pubs/foo.png").
+# selected:  true shows the paper on the homepage.
+# links:     any of project, arxiv, pdf, code, video, slides, poster, openreview, doi.
+#            The title links to the project page, or to arXiv when there is none.
+
+- id: vlaa-gui
+  title: "VLAA-GUI: Knowing When to Stop, Recover, and Search, A Modular Framework for GUI Automation"
+  authors:
+    - "Qijun Han*"
+    - "Haoqin Tu*"
+    - "Zijun Wang"
+    - "Haoyue Dai"
+    - "Yiyang Zhou"
+    - "Nancy Lau"
+    - "Alvaro A. Cardenas"
+    - "Yuhui Xu"
+    - "Ran Xu"
+    - "Caiming Xiong"
+    - "Zeyu Zheng"
+    - "Huaxiu Yao"
+    - "Yuyin Zhou"
+    - "Cihang Xie"
+  note: "* equal contribution"
+  venue: "arXiv preprint arXiv:2604.21375"
+  venue_short: "arXiv"
+  year: 2026
+  date: 2026-04-23
+  selected: true
+  topics: ["GUI agents", "Multimodal LLMs", "Computer use"]
+  teaser: vlaa-gui
+  tldr: >-
+    GUI agents fail in two predictable ways: they declare success too early, and they
+    repeat the same failing action. VLAA-GUI adds a Completeness Verifier (when to stop),
+    a Loop Breaker (when to recover), and an on-demand Search Agent (when to look things up).
+  highlights:
+    - value: "77.5%"
+      label: "OSWorld"
+    - value: "61.0%"
+      label: "WindowsAgentArena"
+    - value: "3 / 5"
+      label: "backbones above human (72.4%) on OSWorld"
+  abstract: >-
+    Autonomous GUI agents face two fundamental challenges: early stopping, where agents
+    prematurely declare success without verifiable evidence, and repetitive loops, where
+    agents cycle through the same failing actions without recovery. We present VLAA-GUI, a
+    modular GUI agentic framework built around three integrated components that guide the
+    system on when to Stop, Recover, and Search. First, a mandatory Completeness Verifier
+    enforces UI-observable success criteria and verification at every finish step, with an
+    agent-level verifier that cross-examines completion claims with decision rules,
+    rejecting those lacking direct visual evidence. Second, a mandatory Loop Breaker provides
+    multi-tier filtering: switching interaction mode after repeated failures, forcing
+    strategy changes after persistent screen-state recurrence, and binding reflection
+    signals to strategy shifts. Third, an on-demand Search Agent searches online for
+    unfamiliar workflows by directly querying a capable LLM with search ability, returning
+    results as plain text. We additionally integrate a Coding Agent for code-intensive
+    actions and a Grounding Agent for precise action grounding, both invoked on demand when
+    required. We evaluate VLAA-GUI across five top-tier backbones, including Opus 4.5, 4.6
+    and Gemini 3.1 Pro, on two benchmarks with Linux and Windows tasks, achieving top
+    performance on both (77.5% on OSWorld and 61.0% on WindowsAgentArena). Notably, three of
+    the five backbones surpass human performance (72.4%) on OSWorld in a single pass.
+    Ablation studies show that all three proposed components consistently improve a strong
+    backbone, while a weaker backbone benefits more from these tools when the step budget is
+    sufficient. Further analysis also shows that the Loop Breaker nearly halves wasted steps
+    for loop-prone models.
+  links:
+    project: "https://ucsc-vlaa.github.io/VLAA-GUI/"
+    arxiv: "https://arxiv.org/abs/2604.21375"
+    pdf: "https://arxiv.org/pdf/2604.21375"
+  bibtex: |-
+    @article{han2026vlaagui,
+      title   = {{VLAA-GUI}: Knowing When to Stop, Recover, and Search, A Modular Framework for {GUI} Automation},
+      author  = {Han, Qijun and Tu, Haoqin and Wang, Zijun and Dai, Haoyue and Zhou, Yiyang and Lau, Nancy and Cardenas, Alvaro A. and Xu, Yuhui and Xu, Ran and Xiong, Caiming and Zheng, Zeyu and Yao, Huaxiu and Zhou, Yuyin and Xie, Cihang},
+      journal = {arXiv preprint arXiv:2604.21375},
+      year    = {2026}
+    }

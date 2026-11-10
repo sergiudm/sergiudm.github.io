@@ -1,7 +1,6 @@
 ---
 title: "Horowitz"
 date: 2024-04-06 09:00:00+0000
-draft: true
 categories: 
     - "music"
 language: "zh"
@@ -9,6 +8,7 @@ tags:
     - "Horowitz"
     - "Piano"
 
+draft: true  # temporarily hidden; set to false to publish again
 ---
 俄罗斯的演奏大师有很多，包括 Vladimir Horowitz、David Oistrakh、Mstislav Rostropovich 这些不同领域的神级演奏家。 就个人而言，也许是因为我更喜欢钢琴作品吧，霍老给我带来的震撼最大。 其实以前很早就听过大家说霍洛维兹弹的如何如何好，当时也没太在意，并没有特别关注他。直到最近听了他的肖邦船歌。
 

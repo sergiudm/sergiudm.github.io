@@ -1,0 +1,26 @@
+{{- /* "Cite this post" BibTeX block. */ -}}
+{{- $names := split site.Params.author.name " " -}}
+{{- $last := index $names (sub (len $names) 1) -}}
+{{- $first := delimit (first (sub (len $names) 1) $names) " " -}}
+{{- $stop := slice "the" "a" "an" "my" "on" "of" "and" "to" "in" "for" "you" "about" "need" "know" "what" -}}
+{{- $word := "" -}}
+{{- range split (urlize .Title) "-" -}}
+  {{- if and (not $word) (findRE `^[a-z][a-z0-9]{2,}$` .) (not (in $stop .)) }}{{ $word = . }}{{ end -}}
+{{- end -}}
+{{- $key := printf "%s%d%s" (lower $last) .Date.Year ($word | default "post") -}}
+{{- $months := slice "jan" "feb" "mar" "apr" "may" "jun" "jul" "aug" "sep" "oct" "nov" "dec" -}}
+{{- $id := printf "cite-%s" (.File.ContentBaseName | default "post" | urlize) -}}
+<section class="cite" aria-label="Cite this post">
+  <div class="cite__head">
+    <p class="cite__title">{{ partial "icon.html" "quote" }} Cite this post</p>
+    <button class="copy-btn" type="button" data-copy-target="{{ $id }}">{{ partial "icon.html" "copy" }}<span>Copy</span></button>
+  </div>
+<pre><code id="{{ $id }}">@misc{ {{- $key }},
+  author       = { {{- $last }}, {{ $first -}} },
+  title        = { {{- .Title -}} },
+  year         = { {{- .Date.Year -}} },
+  month        = {{ index $months (sub (.Date.Format "1" | int) 1) }},
+  howpublished = {\url{ {{- .Permalink -}} }},
+  note         = {Blog post}
+}</code></pre>
+</section>

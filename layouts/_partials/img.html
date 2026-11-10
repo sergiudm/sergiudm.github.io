@@ -1,0 +1,44 @@
+{{- /*
+  Responsive <img>. Context: dict
+    res    image resource (optional)
+    src    fallback URL when there is no resource
+    alt    alt text
+    class  extra class
+    sizes  the sizes attribute (default: article column)
+    eager  true to skip lazy loading
+    zoom   false to opt out of the lightbox
+*/ -}}
+{{- $res := .res -}}
+{{- $alt := .alt | default "" -}}
+{{- $sizes := .sizes | default "(min-width: 1100px) 760px, (min-width: 760px) 90vw, 100vw" -}}
+{{- $loading := cond (eq .eager true) "eager" "lazy" -}}
+{{- $zoom := ne .zoom false -}}
+{{- $processable := false -}}
+{{- if $res -}}
+  {{- if and (eq $res.MediaType.MainType "image") (not (in (slice "svg" "gif" "svg+xml") $res.MediaType.SubType)) -}}
+    {{- $processable = true -}}
+  {{- end -}}
+{{- end -}}
+{{- if $processable -}}
+  {{- $w := $res.Width -}}
+  {{- $srcset := slice -}}
+  {{- $fallback := $res -}}
+  {{- $largest := $res -}}
+  {{- range slice 480 800 1200 1800 -}}
+    {{- if le . $w -}}
+      {{- $r := $res.Resize (printf "%dx webp" .) -}}
+      {{- $srcset = $srcset | append (printf "%s %dw" $r.RelPermalink .) -}}
+      {{- if le . 1200 }}{{ $fallback = $r }}{{ end -}}
+      {{- $largest = $r -}}
+    {{- end -}}
+  {{- end -}}
+  <img src="{{ $fallback.RelPermalink }}"
+    {{- if $srcset }} srcset="{{ delimit $srcset ", " }}" sizes="{{ $sizes }}"{{ end }}
+    width="{{ $res.Width }}" height="{{ $res.Height }}" alt="{{ $alt }}" loading="{{ $loading }}" decoding="async"
+    {{- with .class }} class="{{ . }}"{{ end }}{{ if $zoom }} data-zoom="{{ $largest.RelPermalink }}"{{ else }} data-nozoom{{ end }}>
+{{- else -}}
+  {{- $src := .src -}}
+  {{- with $res }}{{ $src = .RelPermalink }}{{ end -}}
+  <img src="{{ $src }}" alt="{{ $alt }}" loading="{{ $loading }}" decoding="async"
+    {{- with .class }} class="{{ . }}"{{ end }}{{ if $zoom }} data-zoom="{{ $src }}"{{ else }} data-nozoom{{ end }}>
+{{- end -}}

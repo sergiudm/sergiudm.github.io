@@ -1,0 +1,4 @@
+<section class="tabs__panel" data-label="{{ .Get "label" | default (.Get 0) }}">
+  <p class="tabs__fallback-label">{{ .Get "label" | default (.Get 0) }}</p>
+  {{ .Inner | .Page.RenderString (dict "display" "block") }}
+</section>

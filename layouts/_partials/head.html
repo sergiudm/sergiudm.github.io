@@ -1,0 +1,61 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{- $title := cond .IsHome site.Title (printf "%s · %s" .Title site.Title) }}
+{{- $desc := "" }}
+{{- with .Description }}{{ $desc = . }}{{ else }}{{ if .IsPage }}{{ $desc = .Summary | plainify | strings.TrimSpace | truncate 160 }}{{ else }}{{ $desc = site.Params.description }}{{ end }}{{ end }}
+<title>{{ $title }}</title>
+<meta name="description" content="{{ $desc }}">
+<meta name="author" content="{{ site.Params.author.name }}">
+<link rel="canonical" href="{{ .Permalink }}">
+<link rel="icon" href="{{ site.Params.favicon | relURL }}">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101216" media="(prefers-color-scheme: dark)">
+
+{{- /* Open Graph */}}
+<meta property="og:site_name" content="{{ site.Title }}">
+<meta property="og:title" content="{{ cond .IsHome site.Title .Title }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:type" content="{{ cond .IsPage "article" "website" }}">
+{{- $cover := partial "cover.html" . }}
+{{- with $cover }}
+  {{- $og := . }}
+  {{- if and (eq .MediaType.MainType "image") (ne .MediaType.SubType "svg") }}{{ $og = .Fill "1200x630 webp q80 Smart" }}{{ end }}
+<meta property="og:image" content="{{ $og.Permalink }}">
+<meta name="twitter:card" content="summary_large_image">
+{{- else }}
+<meta name="twitter:card" content="summary">
+{{- end }}
+{{- if .IsPage }}
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}
+
+{{- range .AlternativeOutputFormats }}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ site.Title }}">
+{{- end }}
+
+{{- /* Set the theme before first paint so there is no flash. */}}
+<script>
+(function () {
+  var t = null;
+  try { t = localStorage.getItem('theme'); } catch (e) {}
+  var dark = t === 'dark' || (t !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&display=swap">
+
+{{- $css := slice (resources.Get "css/main.css") (resources.Get "css/components.css") (resources.Get "css/syntax.css") | resources.Concat "css/site.css" }}
+{{- if hugo.IsProduction }}{{ $css = $css | minify | fingerprint }}{{ end }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>
+
+{{- if and .IsPage (strings.Contains .Content "class=\"katex") }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
+{{- end }}
+
+{{- partial "jsonld.html" . }}

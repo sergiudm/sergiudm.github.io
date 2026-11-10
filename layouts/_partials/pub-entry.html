@@ -1,0 +1,54 @@
+{{- /* A publication card. Context: dict "pub" <entry from data/publications.yaml> "compact" bool */ -}}
+{{- $p := .pub -}}
+{{- $compact := .compact | default false -}}
+{{- $me := site.Params.author.name -}}
+{{- $labels := dict "arxiv" "arXiv" "pdf" "PDF" "code" "Code" "project" "Project" "openreview" "OpenReview" "video" "Video" "slides" "Slides" "poster" "Poster" "doi" "DOI" -}}
+{{- $icons := dict "arxiv" "arxiv" "pdf" "pdf" "code" "github" "project" "link" "openreview" "openreview" "video" "external" "slides" "layers" "poster" "layers" "doi" "link" -}}
+<article class="pub{{ if $compact }} pub--compact{{ end }}" id="{{ $p.id }}">
+  {{- with $p.teaser }}
+  <div class="pub__teaser">
+    {{- if templates.Exists (printf "_partials/teasers/%s.html" .) }}
+      {{- partial (printf "teasers/%s.html" .) $p }}
+    {{- else }}
+      {{- with resources.Get . }}{{ partial "img.html" (dict "res" . "alt" (printf "Overview figure of %s" $p.title) "sizes" "320px") }}{{ end }}
+    {{- end }}
+  </div>
+  {{- end }}
+  <div class="pub__body">
+    <p class="pub__venue"><span class="badge badge--accent">{{ $p.venue_short | default $p.venue }}</span><span>{{ $p.year }}</span>
+      {{- range $p.topics }}<span class="badge">{{ . }}</span>{{ end }}</p>
+    {{- $titleURL := or $p.links.project $p.links.arxiv }}
+    <h3 class="pub__title">{{ with $titleURL }}<a href="{{ . }}">{{ $p.title }}</a>{{ else }}{{ $p.title }}{{ end }}</h3>
+    <p class="pub__authors">
+      {{- range $i, $a := $p.authors }}{{ if $i }}, {{ end }}
+        {{- $name := strings.TrimRight "*†" $a }}
+        {{- if eq $name $me }}<strong class="me">{{ $a }}</strong>{{ else }}<span>{{ $a }}</span>{{ end }}
+      {{- end }}
+    </p>
+    <p class="pub__where"><em>{{ $p.venue }}</em>, {{ $p.year }}{{ with $p.note }}<span class="muted"> · {{ . }}</span>{{ end }}</p>
+    {{- with $p.tldr }}<p class="pub__tldr">{{ . }}</p>{{ end }}
+    {{- with $p.highlights }}
+    <ul class="pub__highlights">
+      {{- range . }}<li><strong>{{ .value }}</strong><span>{{ .label }}</span></li>{{ end }}
+    </ul>
+    {{- end }}
+    <div class="pub__actions">
+      {{- range $k := slice "project" "arxiv" "pdf" "code" "openreview" "video" "slides" "poster" "doi" }}
+        {{- with index ($p.links | default dict) $k }}
+        <a class="btn btn--sm" href="{{ . }}">{{ partial "icon.html" (index $icons $k) }}{{ index $labels $k }}</a>
+        {{- end }}
+      {{- end }}
+      {{- with $p.abstract }}<button class="btn btn--sm btn--ghost" type="button" data-toggle="abs-{{ $p.id }}" aria-expanded="false" aria-controls="abs-{{ $p.id }}">{{ partial "icon.html" "book" }}Abstract</button>{{ end }}
+      {{- with $p.bibtex }}<button class="btn btn--sm btn--ghost" type="button" data-toggle="bib-{{ $p.id }}" aria-expanded="false" aria-controls="bib-{{ $p.id }}">{{ partial "icon.html" "quote" }}BibTeX</button>{{ end }}
+    </div>
+    {{- with $p.abstract }}
+    <div class="pub__panel" id="abs-{{ $p.id }}" hidden><p>{{ . }}</p></div>
+    {{- end }}
+    {{- with $p.bibtex }}
+    <div class="pub__panel pub__panel--code" id="bib-{{ $p.id }}" hidden>
+      <button class="copy-btn" type="button" data-copy-target="bibtex-{{ $p.id }}">{{ partial "icon.html" "copy" }}<span>Copy</span></button>
+      <pre><code id="bibtex-{{ $p.id }}">{{ . }}</code></pre>
+    </div>
+    {{- end }}
+  </div>
+</article>

@@ -1,0 +1,31 @@
+{{- /*
+  {{< figure src="plot.png" dark="plot-dark.png" caption="**Figure 1.** ..." size="wide" width="480px" link="" zoom="true" >}}
+  size: narrow | wide | full (default: the text column)
+  dark: an alternative image shown in dark mode
+*/ -}}
+{{- $page := .Page -}}
+{{- $lookup := dict -}}
+{{- range $k := slice "src" "dark" -}}
+  {{- with $.Get $k -}}
+    {{- $u := urls.Parse . -}}
+    {{- if not $u.IsAbs -}}
+      {{- with $page.Resources.Get $u.Path -}}{{ $lookup = merge $lookup (dict $k .) }}{{- else -}}{{ with resources.Get $u.Path }}{{ $lookup = merge $lookup (dict $k .) }}{{ end }}{{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $size := .Get "size" | default "" -}}
+{{- $caption := .Get "caption" -}}
+{{- $alt := .Get "alt" | default ($caption | default "" | $page.RenderString | plainify) -}}
+{{- $zoom := ne (.Get "zoom") "false" -}}
+{{- $sizes := cond (in (slice "wide" "full") $size) "(min-width: 1280px) 1040px, 100vw" "" -}}
+<figure class="figure {{ $size }}{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "width" }} style="--figure-max: {{ . }}"{{ end }}>
+  {{- with .Get "link" }}<a href="{{ . }}">{{ end -}}
+  {{- if .Get "dark" -}}
+    {{- partial "img.html" (dict "res" (index $lookup "src") "src" (.Get "src") "alt" $alt "class" "only-light" "zoom" $zoom "sizes" $sizes) -}}
+    {{- partial "img.html" (dict "res" (index $lookup "dark") "src" (.Get "dark") "alt" $alt "class" "only-dark" "zoom" $zoom "sizes" $sizes) -}}
+  {{- else -}}
+    {{- partial "img.html" (dict "res" (index $lookup "src") "src" (.Get "src") "alt" $alt "zoom" $zoom "sizes" $sizes) -}}
+  {{- end -}}
+  {{- with .Get "link" }}</a>{{ end -}}
+  {{- with $caption }}<figcaption>{{ . | $page.RenderString }}</figcaption>{{ end -}}
+</figure>

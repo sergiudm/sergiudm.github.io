@@ -2,25 +2,35 @@
 [goldmark.renderer]
 unsafe = true
 
+[goldmark.parser]
+# Lets a standalone image render as a <figure> (see layouts/_markup/render-image.html).
+wrapStandAloneImageWithinParagraph = false
+
+[goldmark.parser.attribute]
+# Allows {.lead}, {.wide}, {.full} and other attributes after blocks.
+block = true
+title = true
+
 [goldmark.extensions.passthrough]
 enable = true
 
-# LaTeX math support
-# https://gohugo.io/content-management/mathematics/
+# LaTeX math, rendered at build time with KaTeX (layouts/_markup/render-passthrough.html)
 [goldmark.extensions.passthrough.delimiters]
 block = [['\[', '\]'], ['$$', '$$']]
-inline = [['\(', '\)']]
+inline = [['\(', '\)'], ['$', '$']]
+
+[goldmark.extensions.typographer]
+disable = false
 
 [tableOfContents]
 endLevel = 4
-ordered = true
-startLevel = 2
+ordered = false
+startLevel = 1
 
 [highlight]
 noClasses = false
 codeFences = true
 guessSyntax = true
-lineNoStart = 1
-lineNos = true
+lineNos = false
 lineNumbersInTable = true
 tabWidth = 4

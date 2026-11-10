@@ -1,13 +1,13 @@
 ---
 title: "勃四广交之行"
 date: 2025-03-29 09:00:00+0000
-draft: true
 categories: 
     - "music"
 language: "zh"
 tags:
     - "Symphony"
 
+draft: true  # temporarily hidden; set to false to publish again
 ---
 # 2025广交勃四记录
 ## 曲目

@@ -7,6 +7,7 @@ language: "zh"
 tags:
     - "thoughts"
 
+draft: true  # temporarily hidden; set to false to publish again
 ---
 > 24年10月准备冲ICML，一路磕磕碰碰到DDL，还是没能跑出任何拿得出手的数据。
 > 经此一役，我意识到，科研的理想状态并不是“有一个很好的想法，就能把它实现”。于是，本着learning from errors的精神，写下这篇文章，记录一些我在科研过程中总结的经验教训。

@@ -1,0 +1,77 @@
+<svg class="teaser" viewBox="0 0 360 232" role="img" aria-labelledby="vlaa-teaser-title vlaa-teaser-desc">
+  <title id="vlaa-teaser-title">VLAA-GUI at a glance</title>
+  <desc id="vlaa-teaser-desc">A GUI agent observes the screen and acts on it. Two mandatory components, a Completeness Verifier (stop) and a Loop Breaker (recover), and an on-demand Search Agent guide it; Coding and Grounding agents are called on demand.</desc>
+  <defs>
+    <marker id="vlaa-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--t-ink-2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect class="t-bg" x="0" y="0" width="360" height="232" rx="14"/>
+
+  <!-- screen -->
+  <rect class="t-card" x="12" y="60" width="100" height="88" rx="8"/>
+  <path class="t-chrome" d="M20 60h84a8 8 0 0 1 8 8v6H12v-6a8 8 0 0 1 8-8z"/>
+  <circle cx="21" cy="67" r="2.2" class="t-dot--r"/><circle cx="28" cy="67" r="2.2" class="t-dot--y"/><circle cx="35" cy="67" r="2.2" class="t-dot--g"/>
+  <rect class="t-line" x="22" y="84" width="60" height="5" rx="2.5"/>
+  <rect class="t-line" x="22" y="95" width="80" height="5" rx="2.5"/>
+  <rect class="t-line" x="22" y="106" width="48" height="5" rx="2.5"/>
+  <rect class="t-line t-line--soft" x="22" y="119" width="36" height="20" rx="4"/>
+  <rect class="t-target" x="68" y="123" width="34" height="13" rx="4"/>
+  <path class="t-cursor" d="M90 128l0 13 3.2-3 2.3 5 2.2-1-2.3-5h4.5z"/>
+  <text class="t-cap" x="62" y="164" text-anchor="middle">screen</text>
+
+  <!-- observe / act loop -->
+  <path class="t-flow" d="M114 92 C 128 92, 144 96, 157 98" marker-end="url(#vlaa-arrow)"/>
+  <text class="t-cap" x="136" y="86" text-anchor="middle">observe</text>
+  <path class="t-flow" d="M158 116 C 144 118, 128 122, 115 124" marker-end="url(#vlaa-arrow)"/>
+  <text class="t-cap" x="136" y="138" text-anchor="middle">act</text>
+
+  <!-- agent -->
+  <rect class="t-agent" x="160" y="86" width="74" height="42" rx="10"/>
+  <text class="t-title" x="197" y="104" text-anchor="middle">Agent</text>
+  <text class="t-cap" x="197" y="117" text-anchor="middle">VLM backbone</text>
+
+  <!-- three components -->
+  <path class="t-link t-link--stop" d="M234 100 C 242 100, 238 44, 246 44"/>
+  <path class="t-link t-link--recover" d="M234 107 L 246 116"/>
+  <path class="t-link t-link--search t-dash" d="M234 114 C 242 114, 238 188, 246 188"/>
+
+  <g class="t-pill t-pill--stop">
+    <rect x="246" y="22" width="104" height="44" rx="10"/>
+    <text class="t-title" x="255" y="40">Stop</text>
+    <text class="t-sub" x="255" y="54">Completeness Verifier</text>
+    <circle cx="338" cy="36" r="7"/>
+    <path class="t-glyph" d="M334.5 36.2l2.3 2.3 4-4.4"/>
+  </g>
+  <g class="t-pill t-pill--recover">
+    <rect x="246" y="94" width="104" height="44" rx="10"/>
+    <text class="t-title" x="255" y="112">Recover</text>
+    <text class="t-sub" x="255" y="126">Loop Breaker</text>
+    <circle cx="338" cy="108" r="7"/>
+    <path class="t-glyph" d="M341.4 105.8a4 4 0 1 0 .6 3.4M341.6 103.2v2.8h-2.8"/>
+  </g>
+  <g class="t-pill t-pill--search">
+    <rect x="246" y="166" width="104" height="44" rx="10" class="t-dash"/>
+    <text class="t-title" x="255" y="184">Search</text>
+    <text class="t-sub" x="255" y="198">Search Agent</text>
+    <circle cx="338" cy="180" r="7"/>
+    <circle class="t-glyph" cx="337.2" cy="179.2" r="2.6"/>
+    <path class="t-glyph" d="M339.2 181.2l2.2 2.2"/>
+  </g>
+
+  <!-- on-demand helpers -->
+  <path class="t-link t-dash" d="M186 128 L 146 178"/>
+  <path class="t-link t-dash" d="M208 128 L 211 178"/>
+  <g class="t-chip">
+    <rect x="106" y="178" width="70" height="20" rx="10" class="t-dash"/>
+    <text x="141" y="192" text-anchor="middle">Coding agent</text>
+  </g>
+  <g class="t-chip">
+    <rect x="182" y="178" width="58" height="20" rx="10" class="t-dash"/>
+    <text x="211" y="192" text-anchor="middle">Grounding</text>
+  </g>
+
+  <!-- legend -->
+  <path class="t-link" d="M14 214h16"/><text class="t-cap" x="35" y="217">mandatory</text>
+  <path class="t-link t-dash" d="M92 214h16"/><text class="t-cap" x="113" y="217">on demand</text>
+</svg>

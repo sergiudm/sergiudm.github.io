@@ -1,0 +1,81 @@
+{{ define "main" }}
+{{- if eq .Section "post" }}
+{{- $showToc := and site.Params.article.toc (ne .Params.toc false) }}
+{{- $toc := cond $showToc (partial "toc.html" .) "" }}
+<article class="post"{{ with .Params.language }} lang="{{ . }}"{{ end }}>
+  <div class="post-grid">
+    <aside class="post-grid__toc">{{ with $toc }}<div class="toc-sticky">{{ . }}</div>{{ end }}</aside>
+    <div class="post-grid__main">
+      <header class="post-header">
+        {{- with .GetTerms "categories" }}
+        <p class="post-kicker">{{ range $i, $c := . }}{{ if $i }}<span aria-hidden="true"> · </span>{{ end }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}</p>
+        {{- end }}
+        <h1 class="post-title">{{ .Title }}</h1>
+        {{- with .Description }}<p class="post-subtitle">{{ . }}</p>{{ end }}
+        <div class="post-meta">
+          <span class="post-meta__author">
+            {{- with resources.Get site.Params.author.avatar }}{{ $a := .Fill "64x64 webp Center" }}<img src="{{ $a.RelPermalink }}" width="24" height="24" alt="">{{ end -}}
+            {{ site.Params.author.name }}</span>
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+          {{- if gt (.Lastmod.Sub .Date).Hours 48 }}<span>Updated {{ .Lastmod.Format "Jan 2, 2006" }}</span>{{ end }}
+          {{- if site.Params.article.readingTime }}<span>{{ .ReadingTime }} min read</span>{{ end }}
+        </div>
+      </header>
+
+      {{- partial "series.html" . }}
+
+      {{- with $toc }}
+      <details class="toc-mobile">
+        <summary>{{ partial "icon.html" "layers" }} Contents</summary>
+        {{ . }}
+      </details>
+      {{- end }}
+
+      {{- if ne .Params.showCover false }}
+        {{- with partial "cover.html" . }}
+          {{- /* Tall covers (often paper figures) sit framed in the text column instead of spanning the page. */}}
+          {{- $tall := false }}
+          {{- if and (eq .MediaType.MainType "image") (not (in (slice "svg" "svg+xml") .MediaType.SubType)) }}{{ $tall = gt (div (float .Height) .Width) 0.62 }}{{ end }}
+      <figure class="post-cover{{ if $tall }} post-cover--figure{{ end }}">{{ partial "img.html" (dict "res" . "alt" "" "eager" true "sizes" (cond $tall "720px" "(min-width: 1280px) 1000px, 100vw")) }}{{ with $.Params.coverCaption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}</figure>
+        {{- end }}
+      {{- end }}
+
+      <div class="prose">
+        {{ .Content }}
+      </div>
+
+      {{- with .Params.link }}
+      <p class="project-cta"><a class="btn" href="{{ . }}">{{ partial "icon.html" "github" }}View the project</a></p>
+      {{- end }}
+
+      <footer class="post-footer">
+        {{- with .GetTerms "tags" }}
+        <ul class="tag-list" aria-label="Tags">{{ range . }}<li><a href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a></li>{{ end }}</ul>
+        {{- end }}
+
+        {{- if and site.Params.article.cite (ne .Params.cite false) }}{{ partial "cite.html" . }}{{ end }}
+
+        <p class="license">{{ partial "icon.html" "info" }} {{ site.Params.article.license }} — share and adapt with attribution, non-commercially, under the same license. <a href="{{ site.Params.article.licenseURL }}">Details</a>.</p>
+
+        {{- $posts := where site.RegularPages "Section" "post" }}
+        {{- $newer := (where $posts "Date" "gt" .Date).ByDate | first 1 }}
+        {{- $older := (where $posts "Date" "lt" .Date).ByDate.Reverse | first 1 }}
+        {{- if or $newer $older }}
+        <nav class="pager" aria-label="More posts">
+          {{- range $older }}<a class="pager__link pager__link--older" href="{{ .RelPermalink }}"><span>← Older</span><strong>{{ .Title }}</strong></a>{{ else }}<span></span>{{ end }}
+          {{- range $newer }}<a class="pager__link pager__link--newer" href="{{ .RelPermalink }}"><span>Newer →</span><strong>{{ .Title }}</strong></a>{{ end }}
+        </nav>
+        {{- end }}
+
+        {{- partial "comments.html" . }}
+      </footer>
+    </div>
+  </div>
+</article>
+{{- else }}
+<div class="container container--narrow">
+  <header class="page-header"><h1>{{ .Title }}</h1>{{ with .Description }}<p class="page-intro">{{ . }}</p>{{ end }}</header>
+  <div class="prose">{{ .Content }}</div>
+</div>
+{{- end }}
+{{ end }}

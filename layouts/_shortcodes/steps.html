@@ -1,0 +1,10 @@
+{{- /*
+  {{< steps >}}
+  1. **First step.** Details…
+  2. **Second step.** Details…
+  {{< /steps >}}
+  An ordered list rendered as a numbered vertical timeline.
+*/ -}}
+<div class="steps{{ with .Get "class" }} {{ . }}{{ end }}">
+  {{ .Inner | .Page.RenderString (dict "display" "block") }}
+</div>

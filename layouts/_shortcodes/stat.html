@@ -1,0 +1,9 @@
+{{- /*
+  {{< stat value="77.5%" label="on OSWorld" note="single pass" color="green" >}}
+  color: accent | green | amber | blue | purple | red. Numbers count up when scrolled into view.
+*/ -}}
+<div class="stat stat--{{ .Get "color" | default "accent" }}">
+  <div class="stat__value" data-count>{{ .Get "value" }}</div>
+  <div class="stat__label">{{ .Get "label" | .Page.RenderString }}</div>
+  {{- with .Get "note" }}<div class="stat__note">{{ . | $.Page.RenderString }}</div>{{ end }}
+</div>

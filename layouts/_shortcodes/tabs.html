@@ -1,0 +1,10 @@
+{{- /*
+  {{< tabs group="agent" >}}
+  {{< tab "Claude Code" >}} Markdown {{< /tab >}}
+  {{< tab "Codex" >}} Markdown {{< /tab >}}
+  {{< /tabs >}}
+  Tabs that share a `group` switch together, and the choice is remembered.
+*/ -}}
+<div class="tabs{{ with .Get "class" }} {{ . }}{{ end }}"{{ with .Get "group" }} data-group="{{ . }}"{{ end }}>
+  {{ .Inner }}
+</div>

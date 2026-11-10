@@ -1,0 +1,24 @@
+{{- $pubs := hugo.Data.publications }}
+<div class="container container--pubs">
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+    {{- with .Content }}<div class="page-intro">{{ . }}</div>{{ end }}
+    <p class="page-links">
+      {{- range site.Params.social }}{{ if and .url (in (slice "scholar" "openreview" "arxiv" "orcid") .icon) }}
+      <a class="link-chip" href="{{ .url }}">{{ partial "icon.html" .icon }}{{ .name }}</a>
+      {{- end }}{{ end }}
+    </p>
+  </header>
+
+  {{- $years := slice }}
+  {{- range $pubs }}{{ $years = $years | append .year }}{{ end }}
+  {{- range ($years | uniq | sort | collections.Reverse) }}
+    {{- $y := . }}
+  <section class="pub-year">
+    <h2 class="pub-year__label">{{ $y }}</h2>
+    <div class="pub-year__list">
+      {{- range where $pubs "year" $y }}{{ partial "pub-entry.html" (dict "pub" .) }}{{ end }}
+    </div>
+  </section>
+  {{- end }}
+</div>

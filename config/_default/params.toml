@@ -1,150 +1,63 @@
-# Pages placed under these sections will be shown on homepage and archive page.
 mainSections = ["post"]
-# Output page's full content in RSS.
-rssFullContent = true
+description = "Qijun Han, first-year PhD student in the VLAA Lab at UC Santa Cruz, working on computer-use agents and multimodal models."
 favicon = "/favicon.png"
-
-[footer]
 since = 2025
-customText = ""
+# Put the full post in RSS instead of a summary.
+rssFullContent = true
 
-[dateFormat]
-published = "Jan 02, 2006"
-lastUpdated = "Jan 02, 2006 15:04 MST"
+[author]
+name = "Qijun Han"
+avatar = "img/avt.jpg"
+# Shown under your name on the homepage. Leave a field empty to hide it.
+role = "First-year PhD student"
+lab = "VLAA Lab"
+labURL = "https://ucsc-vlaa.github.io/"
+affiliation = "UC Santa Cruz"
+affiliationURL = "https://www.ucsc.edu/"
+advisor = "Prof. Cihang Xie"
+advisorURL = "https://cihangxie.github.io/"
+# Shown on the homepage as a mailto link (assembled by script so it isn't scraped).
+email = ""
+interests = [
+  "Computer-use & GUI agents",
+  "Multimodal language models",
+  "Visual representation learning",
+]
 
-[sidebar]
-emoji = "🍥"
-subtitle = "Everything about my research and my thoughts"
+# Icon links under the bio. `icon` is one of: github, openreview, scholar, arxiv,
+# mail, rss, x, linkedin, orcid, link. Remove an entry or leave url empty to hide it.
+[[social]]
+name = "GitHub"
+url = "https://github.com/sergiudm"
+icon = "github"
 
-[sidebar.avatar]
-enabled = true
-local = true
-src = "img/avt.jpg"
+[[social]]
+name = "OpenReview"
+url = "https://openreview.net/profile?id=~Qijun_Han2"
+icon = "openreview"
+
+[[social]]
+name = "Google Scholar"
+url = ""
+icon = "scholar"
+
+[[social]]
+name = "RSS"
+url = "/index.xml"
+icon = "rss"
 
 [article]
-headingAnchor = false
-math = true
+toc = true
 readingTime = true
+# A "Cite this post" BibTeX block at the end of each post (turn off per post with `cite: false`).
+cite = true
+license = "CC BY-NC-SA 4.0"
+licenseURL = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
 
-[article.license]
-enabled = true
-default = "Licensed under CC BY-NC-SA 4.0"
-
-## Widgets
-[[widgets.homepage]]
-type = "search"
-
-[[widgets.homepage]]
-type = "archives"
-
-[widgets.homepage.params]
-limit = 5
-
-[[widgets.homepage]]
-type = "categories"
-
-[widgets.homepage.params]
-limit = 10
-
-[[widgets.homepage]]
-type = "tag-cloud"
-
-[widgets.homepage.params]
-limit = 10
-
-[[widgets.page]]
-type = "toc"
-
-[opengraph.twitter]
-site = ""
-card = "summary_large_image"
-
-[defaultImage.opengraph]
-enabled = false
-local = false
-src = ""
-
-[colorScheme]
-toggle = true
-default = "auto"
-
-[imageProcessing.cover]
-enabled = true
-
-[imageProcessing.content]
-enabled = true
-
-## Comments
-[comments]
-enabled = true
-provider = "disqus"
-
-[comments.disqusjs]
-shortname = ""
-apiUrl = ""
-apiKey = ""
-admin = ""
-adminLabel = ""
-
-[comments.utterances]
-repo = ""
-issueTerm = "pathname"
-label = ""
-
-[comments.remark42]
-host = ""
-site = ""
-locale = ""
-
-[comments.vssue]
-platform = ""
-owner = ""
-repo = ""
-clientId = ""
-clientSecret = ""
-autoCreateIssue = false
-
-[comments.waline]
-serverURL = ""
-lang = ""
-visitor = ""
-avatar = ""
-emoji = ["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"]
-requiredMeta = ["name", "email", "url"]
-placeholder = ""
-
-[comments.waline.locale]
-admin = "Admin"
-
-[comments.twikoo]
-envId = ""
-region = ""
-path = ""
-lang = ""
-
-[comments.cactus]
-defaultHomeserverUrl = "https://matrix.cactus.chat:8448"
-serverName = "cactus.chat"
-siteName = ""
-
+# Optional comments with giscus (https://giscus.app). Fill these in to turn comments on.
 [comments.giscus]
 repo = ""
 repoID = ""
 category = ""
 categoryID = ""
-mapping = ""
-lightTheme = ""
-darkTheme = ""
-reactionsEnabled = 1
-emitMetadata = 0
-
-[comments.gitalk]
-owner = ""
-admin = ""
-repo = ""
-clientID = ""
-clientSecret = ""
-
-[comments.cusdis]
-host = ""
-id = ""
+mapping = "pathname"

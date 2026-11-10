@@ -1,0 +1,47 @@
+{{- /* Inline SVG icons. Usage: partial "icon.html" "name" */ -}}
+{{- $stroke := dict
+  "sun" `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>`
+  "moon" `<path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/>`
+  "openreview" `<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4H5.5A1.5 1.5 0 0 1 4 14.5z"/><path d="M8.5 10l2 2 4-4"/>`
+  "scholar" `<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/>`
+  "arxiv" `<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13l6 5M15 13l-6 5"/>`
+  "pdf" `<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15h6M9 18h4M9 12h2"/>`
+  "code" `<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/>`
+  "mail" `<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>`
+  "rss" `<path d="M5 11a8 8 0 0 1 8 8M5 5a14 14 0 0 1 14 14"/><circle cx="6" cy="18" r="1.2" fill="currentColor"/>`
+  "link" `<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1-1"/>`
+  "external" `<path d="M7 17L17 7M9 7h8v8"/>`
+  "arrow-right" `<path d="M5 12h14M13 6l6 6-6 6"/>`
+  "note" `<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>`
+  "info" `<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>`
+  "tip" `<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/>`
+  "important" `<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4H5.5A1.5 1.5 0 0 1 4 14.5z"/><path d="M12 7.5v4M12 13.5h.01"/>`
+  "warning" `<path d="M10.3 3.9L2.4 17.6A2 2 0 0 0 4.1 20.6h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17h.01"/>`
+  "caution" `<path d="M8.2 2.5h7.6l5.7 5.7v7.6l-5.7 5.7H8.2l-5.7-5.7V8.2z"/><path d="M12 7.5v5M12 16h.01"/>`
+  "copy" `<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/>`
+  "check" `<path d="M5 12.5l4.5 4.5L19 7.5"/>`
+  "clock" `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>`
+  "calendar" `<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>`
+  "tag" `<path d="M3 12V4.5A1.5 1.5 0 0 1 4.5 3H12l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor"/>`
+  "search" `<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>`
+  "quote" `<path d="M9.5 7H6a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2v1a3 3 0 0 1-3 3M19.5 7H16a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2v1a3 3 0 0 1-3 3"/>`
+  "book" `<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v15H5.5A1.5 1.5 0 0 0 4 19.5z"/><path d="M4 19.5A1.5 1.5 0 0 0 5.5 21H20"/>`
+  "layers" `<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>`
+  "chevron-down" `<path d="M6 9l6 6 6-6"/>`
+  "x" `<path d="M6 6l12 12M18 6L6 18"/>`
+  "terminal" `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12 15h5"/>`
+  "spark" `<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>`
+  "x-social" `<path d="M4 4l16 16M20 4L4 20"/>`
+  "linkedin" `<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7h.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/>`
+  "orcid" `<circle cx="12" cy="12" r="9"/><path d="M9 10v6M9 7.5h.01M12.5 16v-6h2a3 3 0 0 1 0 6z"/>`
+-}}
+{{- $fill := dict
+  "github" `<path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.8 9.7.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 2.9.9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5 4-1.4 6.8-5.2 6.8-9.7C22 6.6 17.5 2 12 2z"/>`
+-}}
+{{- $name := . -}}
+{{- with index $fill $name -}}
+<svg class="icon icon--{{ $name }}" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false">{{ . | safeHTML }}</svg>
+{{- else -}}
+{{- $p := index $stroke $name | default (index $stroke "link") -}}
+<svg class="icon icon--{{ $name }}" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">{{ $p | safeHTML }}</svg>
+{{- end -}}

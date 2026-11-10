@@ -1,0 +1,15 @@
+{{ define "main" }}
+<div class="container container--narrow">
+  <header class="page-header">
+    <p class="page-kicker"><a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a></p>
+    <h1>{{ .Title }}</h1>
+    {{- with .Description }}<p class="page-intro">{{ . }}</p>{{ end }}
+    {{- with .Content }}<div class="page-intro">{{ . }}</div>{{ end }}
+  </header>
+  {{- $pages := .Pages }}
+  {{- if eq .Data.Plural "series" }}{{ $pages = .Pages.ByDate }}{{ end }}
+  <ul class="post-list">
+    {{- range $pages }}{{ partial "post-item.html" (dict "page" . "datefmt" "Jan 2, 2006") }}{{ end }}
+  </ul>
+</div>
+{{ end }}

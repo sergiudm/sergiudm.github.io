@@ -5,6 +5,7 @@ categories:
     - "misc"
 tags:
     - "Thoughts"
+draft: true  # temporarily hidden; set to false to publish again
 ---
 ## 1. 休谟法则
 任何关于“是什么”的事实，都无法自动推导出关于“应该是什么”的价值。

@@ -1,0 +1,6 @@
+{{- /* "HH:MM" → minutes since midnight. Leading zeros are trimmed so "08" is not read as octal. */ -}}
+{{- $p := split (strings.TrimSpace .) ":" -}}
+{{- $h := index $p 0 | strings.TrimLeft "0" | default "0" | int -}}
+{{- $m := 0 -}}
+{{- if ge (len $p) 2 }}{{ $m = index $p 1 | strings.TrimLeft "0" | default "0" | int }}{{ end -}}
+{{- return add (mul $h 60) $m -}}

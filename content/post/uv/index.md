@@ -6,6 +6,7 @@ tags:
     - "uv"
 categories: ["tools"]
 image: "image.png"
+draft: true  # temporarily hidden; set to false to publish again
 ---
 
 If you're a conda user, you may be familiar with the following commands to manage your Python environments:

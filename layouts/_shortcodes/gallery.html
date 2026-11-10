@@ -1,0 +1,14 @@
+{{- /*
+  {{< gallery cols="3" caption="..." size="wide" >}}
+  ![first](a.png "caption")
+
+  ![second](b.png "caption")
+  {{< /gallery >}}
+  Leave a blank line between images so each becomes its own figure.
+*/ -}}
+<figure class="gallery-figure {{ .Get "size" }}">
+  <div class="gallery{{ with .Get "class" }} {{ . }}{{ end }}" style="--cols: {{ .Get "cols" | default 3 }}">
+    {{ .Inner | .Page.RenderString (dict "display" "block") }}
+  </div>
+  {{- with .Get "caption" }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end }}
+</figure>

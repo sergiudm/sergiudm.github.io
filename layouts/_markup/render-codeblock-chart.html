@@ -1,0 +1,13 @@
+{{- /*
+  ```chart {caption="..." height="320" class="wide"}
+  { Chart.js config as JSON: type, data, options }
+  ```
+  Colors default to the site palette; set them yourself to override.
+*/ -}}
+<figure class="chart{{ with .Attributes.class }} {{ . }}{{ end }}">
+  <div class="chart__frame" style="height: {{ .Attributes.height | default "320" }}px">
+    <canvas role="img" aria-label="{{ .Attributes.alt | default .Attributes.caption | default "Chart" }}"></canvas>
+  </div>
+  <script type="application/json" class="chart__config">{{ .Inner | safeJS }}</script>
+  {{- with .Attributes.caption }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end }}
+</figure>

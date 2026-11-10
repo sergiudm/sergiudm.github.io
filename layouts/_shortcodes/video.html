@@ -1,0 +1,14 @@
+{{- /*
+  {{< video src="demo.mp4" poster="demo.jpg" caption="..." autoplay="true" controls="false" size="wide" >}}
+  autoplay (default true) plays muted and looped, like a GIF but smaller.
+*/ -}}
+{{- $src := .Get "src" -}}
+{{- with .Page.Resources.Get $src }}{{ $src = .RelPermalink }}{{ end -}}
+{{- $poster := .Get "poster" -}}
+{{- with $poster }}{{ with $.Page.Resources.Get . }}{{ $poster = .RelPermalink }}{{ end }}{{ end -}}
+{{- $autoplay := ne (.Get "autoplay") "false" -}}
+{{- $controls := or (eq (.Get "controls") "true") (not $autoplay) -}}
+<figure class="figure video {{ .Get "size" }}"{{ with .Get "width" }} style="--figure-max: {{ . }}"{{ end }}>
+  <video src="{{ $src }}" playsinline preload="metadata"{{ with $poster }} poster="{{ . }}"{{ end }}{{ if $autoplay }} autoplay muted loop data-autoplay{{ end }}{{ if $controls }} controls{{ end }}></video>
+  {{- with .Get "caption" }}<figcaption>{{ . | $.Page.RenderString }}</figcaption>{{ end }}
+</figure>

@@ -1,7 +1,6 @@
 ---
 title: "布八广交之行"
 date: 2025-03-24 09:00:00+0000
-draft: true
 categories: 
     - "music"
 language: "zh"
@@ -9,6 +8,7 @@ tags:
     - "Symphony"
     - "Bruckner"
 
+draft: true  # temporarily hidden; set to false to publish again
 ---
 # 2025广交布八记录 
 ## 曲目

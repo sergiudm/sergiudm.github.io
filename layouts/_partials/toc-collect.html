@@ -1,0 +1,7 @@
+{{- /* Flattens .Fragments.Headings into a list of {id, title, level}. */ -}}
+{{- $out := slice -}}
+{{- range . -}}
+  {{- if .ID }}{{ $out = $out | append (dict "id" .ID "title" .Title "level" .Level) }}{{ end -}}
+  {{- with .Headings }}{{ $out = $out | append (partial "toc-collect.html" .) }}{{ end -}}
+{{- end -}}
+{{- return $out -}}

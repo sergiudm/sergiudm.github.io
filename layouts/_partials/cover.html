@@ -1,0 +1,12 @@
+{{- /* Returns the page's cover image resource (front matter `image`), or false. */ -}}
+{{- $res := false -}}
+{{- with .Params.image -}}
+  {{- $p := . -}}
+  {{- if not (strings.HasPrefix $p "http") -}}
+    {{- with $.Resources.Get $p -}}{{ $res = . }}{{- else -}}{{ with resources.Get $p }}{{ $res = . }}{{ end }}{{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if and (not $res) .IsHome -}}
+  {{- with resources.Get site.Params.author.avatar }}{{ $res = . }}{{ end -}}
+{{- end -}}
+{{- return $res -}}

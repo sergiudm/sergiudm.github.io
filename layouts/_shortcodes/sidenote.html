@@ -1,0 +1,10 @@
+{{- /*
+  Text{{< sidenote >}}A note in the margin (inline Markdown).{{< /sidenote >}} continues.
+  Wide screens show it in the right margin; narrow screens toggle it inline.
+  numbered="false" gives an unnumbered margin note.
+*/ -}}
+{{- $id := printf "sn-%d" .Ordinal -}}
+{{- with .Parent }}{{ $id = printf "sn-%d-%d" .Ordinal $.Ordinal }}{{ end -}}
+{{- $numbered := ne (.Get "numbered") "false" -}}
+<span class="sidenote-wrap{{ if not $numbered }} sidenote-wrap--plain{{ end }}"><label for="{{ $id }}" class="sidenote-ref" aria-label="Show note">{{ if not $numbered }}⊕{{ end }}</label><input type="checkbox" id="{{ $id }}" class="sidenote-toggle"><span class="sidenote" role="note">{{ .Inner | strings.TrimSpace | .Page.RenderString }}</span></span>
+{{- /* no trailing newline */ -}}

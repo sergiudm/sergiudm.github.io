@@ -1,0 +1,22 @@
+{{- /*
+  {{< callout type="tip" title="Optional title" >}} Markdown {{< /callout >}}
+  type: note | tip | important | warning | caution | success | question | example
+  collapse: "open" or "closed" turns it into a disclosure.
+*/ -}}
+{{- $type := .Get "type" | default (.Get 0) | default "note" | lower -}}
+{{- $icons := dict "note" "note" "info" "note" "tip" "tip" "important" "important" "warning" "warning" "caution" "caution" "success" "check" "question" "info" "example" "spark" -}}
+{{- $icon := index $icons $type | default "note" -}}
+{{- $title := .Get "title" | default (title $type) -}}
+{{- $collapse := .Get "collapse" -}}
+{{- $body := .Inner | .Page.RenderString (dict "display" "block") -}}
+{{- if $collapse -}}
+<details class="callout callout--{{ $type }}"{{ if eq $collapse "open" }} open{{ end }}>
+  <summary class="callout__title">{{ partial "icon.html" $icon }}<span>{{ $title | .Page.RenderString }}</span>{{ partial "icon.html" "chevron-down" }}</summary>
+  <div class="callout__body">{{ $body }}</div>
+</details>
+{{- else -}}
+<aside class="callout callout--{{ $type }}">
+  <p class="callout__title">{{ partial "icon.html" $icon }}<span>{{ $title | .Page.RenderString }}</span></p>
+  <div class="callout__body">{{ $body }}</div>
+</aside>
+{{- end -}}

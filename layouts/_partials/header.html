@@ -1,0 +1,23 @@
+{{- $current := . }}
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="wordmark" href="{{ "/" | relURL }}">
+      <span class="wordmark__mark" aria-hidden="true">{{ substr site.Params.author.name 0 1 }}</span>
+      <span class="wordmark__name">{{ site.Params.author.name }}</span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      {{- range site.Menus.main }}
+        {{- $active := false }}
+        {{- if eq .URL "/" }}{{ $active = $current.IsHome }}
+        {{- else if eq .URL "/blog/" }}{{ $active = or (eq $current.Section "post") (in (slice "taxonomy" "term") $current.Kind) }}
+        {{- else }}{{ $active = strings.HasPrefix $current.RelPermalink .URL }}{{ end }}
+        <a href="{{ .URL | relURL }}"{{ if $active }} aria-current="page" class="is-active"{{ end }}>{{ .Name }}</a>
+      {{- end }}
+      <button class="theme-toggle" type="button" aria-label="Switch between light and dark theme" title="Toggle theme">
+        <span class="theme-toggle__sun">{{ partial "icon.html" "sun" }}</span>
+        <span class="theme-toggle__moon">{{ partial "icon.html" "moon" }}</span>
+      </button>
+    </nav>
+  </div>
+  {{- if and .IsPage (eq .Section "post") }}<div class="progress" aria-hidden="true"><span class="progress__bar"></span></div>{{ end }}
+</header>
