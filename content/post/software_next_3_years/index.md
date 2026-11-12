@@ -25,13 +25,13 @@ We wanted it to act. So we let the model call functions, gave it the results, an
 
 From 2023 to 2026 the harness is where most of the invention happened: function calling, tool protocols such as MCP, computer use, coding agents that live in a terminal, skills, subagents, runs that go on for hours. The models improved underneath all of it.
 
-In 2023, when an agent failed, it was nearly always the agent's own fault. It lost the plan, repeated an action that had already failed, or announced success too early.{{< sidenote >}}The last two are what my own paper, [VLAA-GUI](https://arxiv.org/abs/2604.21375), is about: a verifier that decides when to stop, and a loop breaker that decides when to change strategy.{{< /sidenote >}} Everything around the agent was good enough, because the agent could not have used anything better.
+In 2023, when an agent failed, it was nearly always the agent's own fault. It lost the plan, repeated an action that had already failed, or announced success too early. Everything around the agent was good enough, because the agent could not have used anything better.
 
 {{< figure src="pipeline-then.svg" dark="pipeline-then-dark.svg" size="wide" alt="2023: you write a prompt and read an answer, the agent executes a tool call or two on software and explores what the tools return. The agent is marked as the bottleneck: it lost the plan, repeated itself and stopped too early." caption="**2023.** You write a prompt and read an answer; the agent makes a tool call or two. The narrowest part of the pipeline is the agent itself." >}}
 
 ## The bottleneck moved
 
-That stopped being true. In the VLAA-GUI experiments, three of the five backbone models we tried finished more OSWorld tasks than the human baseline (72.4%), and the best reached 77.5%. On that benchmark, an agent driving a real desktop with a mouse and a keyboard now does at least as well as a person.
+That stopped being true. On [OSWorld](https://os-world.github.io/), a benchmark of real desktop tasks, several agents now finish more tasks than the human baseline of about 72%. An agent driving a desktop with a mouse and a keyboard does at least as well as a person there.
 
 Now look at what stayed the same in the picture. I still write prompts and read answers. The agent still works on software from the outside. Those two pipes are as wide as they were in 2023, and far more is trying to get through them.
 
