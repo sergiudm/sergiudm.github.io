@@ -1,5 +1,5 @@
 ---
-title: "What Should Software Look Like in the Next 3 Years?"
+title: "The Bottleneck Is Now the Interface"
 description: "Agents got smart, but we still talk to them through a chat box, and they still reach our software through its front door. I think the next three years belong to the interface: apps whose state an agent reads directly, and where you can answer with more than words."
 slug: "software-in-the-next-3-years"
 date: 2026-11-11 09:00:00+0000
