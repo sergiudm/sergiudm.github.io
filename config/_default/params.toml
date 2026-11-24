@@ -7,7 +7,7 @@ rssFullContent = true
 
 [author]
 name = "Qijun Han"
-avatar = "img/avt.jpg"
+avatar = "img/avatar.jpg"
 # Shown under your name on the homepage. Leave a field empty to hide it.
 role = "First-year PhD student"
 lab = "VLAA Lab"

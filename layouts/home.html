@@ -5,8 +5,8 @@
   <section class="hero" aria-label="About me">
     <div class="hero__photo">
       {{- with resources.Get $a.avatar }}
-        {{- $img := .Fill "480x480 webp Center" }}
-        <img src="{{ $img.RelPermalink }}" width="240" height="240" alt="Portrait of {{ $a.name }}" fetchpriority="high">
+        {{- $img := .Fill "300x400 webp Center" }}
+        <img src="{{ $img.RelPermalink }}" width="120" height="160" alt="Portrait of {{ $a.name }}" fetchpriority="high">
       {{- end }}
     </div>
     <div class="hero__text">

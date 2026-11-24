@@ -395,7 +395,7 @@ a:hover { color: var(--accent-hover); }
 
 .hero {
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
+  grid-template-columns: 120px minmax(0, 1fr);
   gap: 48px;
   align-items: start;
   padding: 64px 0 24px;
@@ -403,10 +403,10 @@ a:hover { color: var(--accent-hover); }
 
 .hero__photo img {
   display: block;
-  width: 200px;
-  height: 200px;
+  width: 120px;
+  height: 160px;
   object-fit: cover;
-  border-radius: 22px;
+  border-radius: 16px;
   box-shadow: var(--shadow-md);
   background: var(--surface-2);
 }
@@ -1345,7 +1345,7 @@ a [data-zoom] { cursor: pointer; }
 @media (max-width: 760px) {
   :root { --gutter: 16px; }
   .hero { grid-template-columns: 1fr; gap: 20px; padding-top: 40px; }
-  .hero__photo img { width: 108px; height: 108px; border-radius: 18px; }
+  .hero__photo img { width: 72px; height: 96px; border-radius: 12px; }
   .hero__bio { font-size: 1.06rem; }
   .pub { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
   .pub-year { grid-template-columns: 1fr; gap: 4px; }
