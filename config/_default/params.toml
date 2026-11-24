@@ -25,7 +25,7 @@ interests = [
 ]
 
 # Icon links under the bio. `icon` is one of: github, openreview, scholar, arxiv,
-# mail, rss, x, linkedin, orcid, link. Remove an entry or leave url empty to hide it.
+# mail, rss, x-social, linkedin, orcid, link. Remove an entry or leave url empty to hide it.
 [[social]]
 name = "GitHub"
 url = "https://github.com/sergiudm"
@@ -40,6 +40,11 @@ icon = "openreview"
 name = "Google Scholar"
 url = ""
 icon = "scholar"
+
+[[social]]
+name = "X"
+url = "https://x.com/sergiu2119655"
+icon = "x-social"
 
 [[social]]
 name = "RSS"

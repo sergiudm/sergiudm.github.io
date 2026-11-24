@@ -1,6 +1,6 @@
 ---
-title: "The Bottleneck Is Now the Interface"
-description: "Agents got smart, but we still talk to them through a chat box, and they still reach our software through its front door. I think the next three years belong to the interface: apps whose state an agent reads directly, and where you can answer with more than words."
+title: "Software in the Next 3 Years, Part 1: The Bottleneck Is Now the Interface"
+description: "Models and harnesses keep improving. The links around the agent have not: you still talk to it in prose, and it still reads your apps through screenshots. That is the new bottleneck."
 slug: "software-in-the-next-3-years"
 date: 2026-11-11 09:00:00+0000
 image: "cover.png"
@@ -14,218 +14,485 @@ tags:
     - "Schedule Everything"
 ---
 
-Three years ago an LLM could only chat. Today an agent can plan, call tools and work for hours, and nearly all of that progress came from two places: better models, and better harnesses around them. The way we talk to agents has not moved. It is still a chat session. I think that is now the weakest part of the whole system, and that the next three years of software should go into fixing it. This post is the argument, with pictures, and a look at what we are building toward at [AutoPhD](https://github.com/AutoPhd-org).
+Agents can do about ten times more than they could two years ago.{{< sidenote >}}By [METR's measure](https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/), the length of task an agent can finish has doubled roughly every seven months since 2019. Two years of that is about 10x.{{< /sidenote >}} Are you ten times more productive? Probably not. And I don't think the model or the harness is what's holding you back anymore.
 {.lead}
 
-## From chatbots to agents
+{{< figure src="gap.svg" dark="gap-dark.svg" size="wide" alt="An illustrative chart from 2023 to 2026. The line for what agents can do rises steeply. A dashed line for your productivity, if it had kept up, rises with it. The solid line for what you actually get done stays nearly flat, and a large question mark sits in the widening gap." caption="An illustration, not a measurement. This post is about the flat line." >}}
 
-First we had LLMs, and an LLM did one thing: you sent it text and it sent text back. Put a text box in front of it and you have a chatbot. A chatbot can explain how to rename a hundred files. It cannot rename them.
+The gap is not only a feeling. In a [2025 randomized study by METR](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/), experienced open-source developers took 19% longer with AI tools, while believing they had been 20% faster. The models have improved a lot since then, and I am not saying agents don't help. I am saying that what agents can do and what we get out of them are no longer growing at the same rate.
 
-We wanted it to act. So we let the model call functions, gave it the results, and let it go round again until the job was done. The code that does this (the loop, the tools, the memory, the sandbox, the permission prompts) is the **harness**, and a model inside a harness is what we now call an agent.
-
-From 2023 to 2026 the harness is where most of the invention happened: function calling, tool protocols such as MCP, computer use, coding agents that live in a terminal, skills, subagents, runs that go on for hours. The models improved underneath all of it.
-
-In 2023, when an agent failed, it was nearly always the agent's own fault. It lost the plan, repeated an action that had already failed, or announced success too early. Everything around the agent was good enough, because the agent could not have used anything better.
-
-{{< figure src="pipeline-then.svg" dark="pipeline-then-dark.svg" size="wide" alt="2023: you write a prompt and read an answer, the agent executes a tool call or two on software and explores what the tools return. The agent is marked as the bottleneck: it lost the plan, repeated itself and stopped too early." caption="**2023.** You write a prompt and read an answer; the agent makes a tool call or two. The narrowest part of the pipeline is the agent itself." >}}
+Nearly every improvement since ChatGPT came out has landed in two places: better models, and better harnesses around them (function calling, MCP, skills, subagents, memory, runs that go on for hours). This post is about the parts that did not improve, and why I think they are now the bottleneck.
 
 ## The bottleneck moved
 
-That stopped being true. On [OSWorld](https://os-world.github.io/), a benchmark of real desktop tasks, several agents now finish more tasks than the human baseline of about 72%. An agent driving a desktop with a mouse and a keyboard does at least as well as a person there.
+In 2023, when an agent failed at a task, it was nearly always the agent's own fault. It called the wrong tool, looped on the same action, or simply lost the instructions. We complained about short context windows, poor instruction following, and clumsy harnesses. The bottleneck was the agent itself.
 
-Now look at what stayed the same in the picture. I still write prompts and read answers. The agent still works on software from the outside. Those two pipes are as wide as they were in 2023, and far more is trying to get through them.
+{{< figure src="pipeline-then.svg" dark="pipeline-then-dark.svg" size="wide" alt="2023: you write a prompt and read an answer, the agent executes a tool call or two on software and explores what the tools return. The agent is marked as the bottleneck: it lost the plan, repeated itself and stopped too early." caption="**2023.** You write a prompt and read an answer; the agent makes a tool call or two. The narrowest part of the pipeline is the agent itself." >}}
+
+Thanks to the whole AI community, agents improved on every one of those fronts, and we got bolder about what we hand them: first code completion, then whole pull requests, then essays and slide decks. Lately, always-on assistants such as OpenClaw have started to work proactively, around the clock. Their developers want to automate as much as possible, so that all you have to do is write a prompt and read an answer.
+
+Now look at what stayed the same in the picture. We still write prompts and read answers. The agent still works on software from the outside. The way we talk to agents is almost the same as in 2023, and so is the way agents reach our software. The bottleneck has moved from the middle to the two links. If you have ever rewritten a prompt three times, or skimmed a 900-word answer for the one line you needed, you have felt it. That is what puts most of us on the flat line in the first picture.
+
+There is one exception, and it proves the rule: coding. Coding is the one domain that partly escaped the chat box. In Cursor you press <kbd>Tab</kbd> to accept the next edit, so your intent travels in one key, and the agent reads where you are from your cursor. When an agent changes code, you check its work in one glance at a `git diff`, and the tests check it for you. Both links are wide. Canvas and Artifacts brought a little of this to writing and small apps. I don't think it is a coincidence that coding agents feel magical, while agents that make slides, plan your week or drive desktop apps still feel clunky.
 
 {{< figure src="pipeline-now.svg" dark="pipeline-now-dark.svg" size="wide" alt="2026: the agent, wrapped in a harness, plans, calls tools and works for hours. The two links are marked as bottlenecks. Between you and the agent, what you see has to become words and you read long answers. Between the agent and the software, screenshots, clicks and file reads burn tokens before the work starts." caption="**2026.** The agent grew and the pipes did not. More waits at each end than fits through, so the red has moved from the middle to the two links." >}}
 
-So is a chat session good enough for talking to an agent? No, and the reason is different on each side.
+Let's take the two links one at a time.
 
-### For the person, it is not easy
+## Bottleneck 1: prose is bad at structure
 
-Much of what I want to tell an agent is something I am looking at. The third bar of a chart. The run whose loss curve jumps near the end. The task that should come before lunch, not after. In a chat box I have to turn what I see into a sentence, and then the agent has to turn the sentence back into the thing and hope it picked the right one. "No, the other one" is a message I have sent more than once.
+Is a chat session good enough for talking to an agent? I don't think so.
 
-Try it both ways:
+Two kinds of information pass between you and an agent:
 
-{{< demo title="Say it, or point at it" caption="The six runs are the same in both cases. Only the way you answer changes." >}}
+1. **Content**: what you actually care about. Which runs failed. Which task comes first.
+2. **Structure**: how that content is organized. A list of runs, each with a status and a loss. A task with a priority and a due date.
+
+Natural language is good at content and bad at structure. When you write a long prompt, much of the effort goes into spelling out structure, and structure barely changes from one prompt to the next. That is exactly why it can be turned into patterns.
+
+The other direction is no better. An agent's answer is often long, and reading a long answer is slow and error-prone: you miss something, or you misread it. Try it:
+
+{{< demo title="Same report, two forms" size="wide" caption="Both sides carry the same facts. Turn on **Show only the values** to see how much of the prose is structure you already knew." >}}
 <style>
-  .pt { display: grid; gap: 14px; }
-  .pt__task { margin: 0; font-weight: 600; }
-  .pt__runs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-  .pt__run { display: grid; gap: 4px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
-  .pt__run:hover { border-color: var(--accent); }
-  .pt__run[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
-  .pt__run svg { display: block; width: 100%; height: 44px; }
-  .pt__run path { fill: none; stroke: var(--series-1); stroke-width: 2; vector-effect: non-scaling-stroke; }
-  .pt__name { font: 600 0.78rem/1.2 var(--font-mono); color: var(--muted); }
-  .pt__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .pt__col { display: grid; gap: 8px; align-content: start; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
-  .pt__col strong { font: 700 0.78rem/1.2 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-  .pt__col textarea, .pt__msg { box-sizing: border-box; width: 100%; min-height: 84px; margin: 0; padding: 8px 10px; border-radius: 8px; font-size: 0.88rem; line-height: 1.5; }
-  .pt__col textarea { resize: vertical; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-family: inherit; }
-  .pt__msg { border: 1px solid var(--border); background: var(--code-bg); color: var(--text); font-family: var(--font-mono); font-size: 0.82rem; white-space: pre-wrap; overflow: hidden; }
-  .pt__cost { font-size: 0.85rem; color: var(--muted); }
-  .pt__cost b { color: var(--text); font-variant-numeric: tabular-nums; }
-  @media (max-width: 640px) { .pt__cols { grid-template-columns: 1fr; } .pt__runs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .rp { display: grid; gap: 12px; }
+  .rp__q { margin: 0; font-weight: 600; }
+  .rp__cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+  .rp__col { display: grid; gap: 8px; align-content: start; min-width: 0; }
+  .rp__head { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 30px; }
+  .rp__head strong { font: 700 0.75rem/1.2 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .rp__toggle { font: 600 0.78rem/1 var(--font-sans); padding: 7px 11px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; }
+  .rp__toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .rp__prose, .rp__board { box-sizing: border-box; height: 380px; border: 1px solid var(--border); border-radius: 10px; }
+  .rp__prose { overflow: auto; padding: 12px 14px; background: var(--code-bg); font-size: 0.85rem; line-height: 1.55; color: var(--text); transition: color 0.2s; }
+  .rp__prose h4 { margin: 0.9em 0 0.3em; font-size: 0.88rem; }
+  .rp__prose h4:first-child { margin-top: 0; }
+  .rp__prose p, .rp__prose ul { margin: 0 0 0.6em; }
+  .rp__prose ul { padding-left: 1.2em; }
+  .rp__prose li { margin: 0.25em 0; }
+  .rp.is-values .rp__prose { color: color-mix(in srgb, var(--text) 20%, transparent); }
+  .rp.is-values .rp__prose .v { color: var(--text); background: var(--mark); border-radius: 3px; box-shadow: 0 0 0 2px var(--mark); }
+  .rp__stat { margin: 0; font-size: 0.85rem; color: var(--muted); }
+  .rp__stat b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .rp__board { display: grid; grid-template-rows: auto auto 1fr; gap: 10px; padding: 12px; background: var(--surface); }
+  .rp__label { font-size: 0.8rem; color: var(--muted); }
+  .rp__runs { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
+  .rp__run { display: grid; gap: 4px; padding: 8px 9px; border: 1.5px solid var(--border); border-radius: 9px; background: var(--bg); min-width: 0; }
+  .rp__run--bad { border-color: var(--c-caution); background: var(--c-caution-bg); }
+  .rp__run--best { border-color: var(--c-tip); }
+  .rp__name { font: 600 0.72rem/1.2 var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rp__val { font: 700 0.98rem/1.15 var(--font-sans); font-variant-numeric: tabular-nums; color: var(--text); }
+  .rp__chip { justify-self: start; font: 700 0.64rem/1 var(--font-sans); letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 6px; border-radius: 999px; }
+  .rp__chip--done { color: var(--c-tip); background: var(--c-tip-bg); }
+  .rp__chip--bad { color: var(--c-caution); background: color-mix(in srgb, var(--c-caution) 14%, transparent); }
+  .rp__chip--run { color: var(--c-warning); background: var(--c-warning-bg); }
+  .rp__bar { height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }
+  .rp__bar i { display: block; height: 100%; width: 73%; background: var(--c-warning); }
+  .rp__ask { align-self: end; display: grid; gap: 8px; padding: 10px; border: 1.5px dashed var(--c-important); border-radius: 10px; background: var(--c-important-bg); }
+  .rp__ask p { margin: 0; font-size: 0.86rem; color: var(--text); }
+  .rp__btns { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rp__btns button { font: 600 0.78rem/1 var(--font-sans); padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; }
+  .rp__btns button:hover { border-color: var(--accent); }
+  .rp__btns button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+  .rp__out { margin: 0; min-height: 1.4em; font: 0.74rem/1.4 var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+  @media (max-width: 720px) {
+    .rp__cols { grid-template-columns: minmax(0, 1fr); }
+    .rp__prose { height: 300px; }
+    .rp__board { height: auto; }
+  }
 </style>
-<div class="pt" data-pt>
-  <p class="pt__task">Two of these six training runs diverged. Tell your agent to rerun them.</p>
-  <div class="pt__runs" data-pt-runs></div>
-  <div class="pt__cols">
-    <div class="pt__col">
-      <strong>Say it</strong>
-      <textarea data-pt-text placeholder="Type what you would write in a chat box…" aria-label="Your instruction, in words"></textarea>
-      <span class="pt__cost"><b data-pt-keys>0</b> characters, and the agent still has to work out which runs you mean.</span>
+<div class="rp" data-rp>
+  <p class="rp__q">Your agent ran a six-run learning-rate sweep overnight. Which runs need you, and what is it asking?</p>
+  <div class="rp__cols">
+    <div class="rp__col">
+      <div class="rp__head"><strong>As prose</strong><button class="rp__toggle" type="button" aria-pressed="false" data-rp-toggle>Show only the values</button></div>
+      <div class="rp__prose" data-rp-prose tabindex="0" aria-label="The agent's report, as prose">
+        <h4>Overnight sweep: status report</h4>
+        <p>I've completed a thorough review of all six training runs in the learning-rate sweep. Here is a detailed breakdown of where everything currently stands, along with my recommendations for next steps.</p>
+        <h4>✅ Completed runs</h4>
+        <ul>
+          <li><strong><span class="v">run-01</span></strong> (lr = <span class="v">1e-4</span>) <span class="v">finished</span> successfully after the full 12,000 steps. Its final validation loss was <strong><span class="v">2.31</span></strong>, which is broadly in line with what we expected.</li>
+          <li><strong><span class="v">run-03</span></strong> (lr = <span class="v">3e-4</span>) also <span class="v">finished</span> without any issues. It reached a final validation loss of <strong><span class="v">2.18</span></strong>, which makes it the <strong><span class="v">best run</span></strong> in the sweep so far.</li>
+          <li><strong><span class="v">run-04</span></strong> (lr = <span class="v">5e-4</span>) <span class="v">finished</span> as well, with a final validation loss of <span class="v">2.26</span>.</li>
+        </ul>
+        <h4>⚠️ Runs that need your attention</h4>
+        <ul>
+          <li><strong><span class="v">run-02</span></strong> (lr = <span class="v">2e-3</span>) <span class="v">diverged</span> at around step <span class="v">7,400</span>. The loss spiked sharply and became NaN shortly afterwards, which is a classic sign that the learning rate is too high for this configuration.</li>
+          <li><strong><span class="v">run-05</span></strong> (lr = <span class="v">1e-3</span>) showed similar signs of instability and ultimately <span class="v">diverged</span> at step <span class="v">9,100</span>.</li>
+        </ul>
+        <h4>⏳ Still in progress</h4>
+        <ul>
+          <li><strong><span class="v">run-06</span></strong> (lr = <span class="v">7e-4</span>) is <span class="v">still running</span>. It is currently at step 8,800 of 12,000 (roughly <span class="v">73%</span>) and should finish in approximately <span class="v">2 hours</span>.</li>
+        </ul>
+        <h4>Next steps</h4>
+        <p>Would you like me to <span class="v">rerun run-02 and run-05</span> with <span class="v">gradient clipping</span> enabled? Alternatively, I could <span class="v">lower their learning rates</span> and try again. Just let me know how you'd like to proceed, and I'll take care of the rest!</p>
+      </div>
+      <p class="rp__stat" data-rp-stat aria-live="polite"></p>
     </div>
-    <div class="pt__col">
-      <strong>Point at it</strong>
-      <pre class="pt__msg" data-pt-msg aria-live="polite"></pre>
-      <span class="pt__cost"><b data-pt-clicks>0</b> clicks, and the agent gets the runs themselves.</span>
+    <div class="rp__col">
+      <div class="rp__head"><strong>As structure</strong></div>
+      <div class="rp__board">
+        <span class="rp__label">Overnight sweep · validation loss</span>
+        <div class="rp__runs">
+          <div class="rp__run"><span class="rp__name">run-01 · 1e-4</span><span class="rp__chip rp__chip--done">done</span><span class="rp__val">2.31</span></div>
+          <div class="rp__run rp__run--bad"><span class="rp__name">run-02 · 2e-3</span><span class="rp__chip rp__chip--bad">diverged</span><span class="rp__val">NaN @ 7.4k</span></div>
+          <div class="rp__run rp__run--best"><span class="rp__name">run-03 · 3e-4</span><span class="rp__chip rp__chip--done">best</span><span class="rp__val">2.18</span></div>
+          <div class="rp__run"><span class="rp__name">run-04 · 5e-4</span><span class="rp__chip rp__chip--done">done</span><span class="rp__val">2.26</span></div>
+          <div class="rp__run rp__run--bad"><span class="rp__name">run-05 · 1e-3</span><span class="rp__chip rp__chip--bad">diverged</span><span class="rp__val">NaN @ 9.1k</span></div>
+          <div class="rp__run"><span class="rp__name">run-06 · 7e-4</span><span class="rp__chip rp__chip--run">running</span><span class="rp__val">73% · 2 h</span><span class="rp__bar"><i></i></span></div>
+        </div>
+        <div class="rp__ask">
+          <p><strong>Rerun run-02 and run-05?</strong></p>
+          <div class="rp__btns" data-rp-btns>
+            <button type="button" aria-pressed="false" data-out='rerun(["run-02", "run-05"], grad_clip=1.0)'>With clipping</button>
+            <button type="button" aria-pressed="false" data-out='rerun(["run-02", "run-05"], lr="×0.5")'>Lower LR</button>
+            <button type="button" aria-pressed="false" data-out="// not now: they stay on the board">Not now</button>
+          </div>
+          <p class="rp__out" data-rp-out aria-live="polite"></p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <script>
 (function () {
-  var root = document.querySelector('[data-pt]');
+  var root = document.querySelector('[data-rp]');
   if (!root) return;
-  var runs = root.querySelector('[data-pt-runs]');
-  var msg = root.querySelector('[data-pt-msg]');
-  var text = root.querySelector('[data-pt-text]');
-  var diverged = { 1: true, 5: true };
-  var clicks = 0;
-  function curve(k) {
-    var d = '';
-    for (var i = 0; i <= 24; i++) {
-      var v = 0.86 * Math.exp(-i / (5 + k % 3)) + 0.08 + 0.02 * Math.sin(i * 1.7 + k * 2.1);
-      if (diverged[k] && i > 12) v += 0.78 * Math.pow((i - 12) / 12, 1.5) + 0.03 * Math.sin(i * 2.6);
-      d += (i ? ' L' : 'M') + (i / 24 * 100).toFixed(1) + ',' + (42 - Math.min(v, 1) * 38).toFixed(1);
-    }
-    return d;
+  var prose = root.querySelector('[data-rp-prose]');
+  var stat = root.querySelector('[data-rp-stat]');
+  var toggle = root.querySelector('[data-rp-toggle]');
+  function words(s) { return (s.match(/[A-Za-z0-9][\w.,%@×'-]*/g) || []).length; }
+  var total = words(prose.textContent);
+  var vals = 0;
+  prose.querySelectorAll('.v').forEach(function (el) { vals += words(el.textContent); });
+  var pct = Math.round(vals / total * 100);
+  function render() {
+    var on = toggle.getAttribute('aria-pressed') === 'true';
+    root.classList.toggle('is-values', on);
+    toggle.textContent = on ? 'Show everything' : 'Show only the values';
+    stat.innerHTML = on
+      ? 'Only <b>' + vals + '</b> of these <b>' + total + '</b> words (<b>' + pct + '%</b>) are values. The rest is structure.'
+      : '<b>' + total + '</b> words. Scroll to find what needs you.';
   }
-  function update() {
-    var picked = [];
-    runs.querySelectorAll('[aria-pressed="true"]').forEach(function (b) { picked.push('  "' + b.dataset.run + '"'); });
-    msg.textContent = picked.length ? 'rerun([\n' + picked.join(',\n') + '\n])' : '// click the runs above';
-    root.querySelector('[data-pt-clicks]').textContent = clicks;
-    root.querySelector('[data-pt-keys]').textContent = text.value.length;
-  }
-  for (var k = 0; k < 6; k++) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'pt__run';
-    b.dataset.run = 'run-0' + (k + 1);
-    b.setAttribute('aria-pressed', 'false');
-    b.innerHTML = '<span class="pt__name">run-0' + (k + 1) + '</span><svg viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true"><path d="' + curve(k) + '"/></svg>';
+  toggle.addEventListener('click', function () {
+    toggle.setAttribute('aria-pressed', toggle.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    render();
+  });
+  var out = root.querySelector('[data-rp-out]');
+  root.querySelectorAll('[data-rp-btns] button').forEach(function (b, _, all) {
     b.addEventListener('click', function () {
-      this.setAttribute('aria-pressed', this.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
-      clicks += 1;
-      update();
+      all.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      out.textContent = '→ ' + b.dataset.out;
     });
-    runs.appendChild(b);
-  }
-  text.addEventListener('input', update);
-  update();
+  });
+  render();
 })();
 </script>
 {{< /demo >}}
 
-The other direction is no better. The agent works for twenty minutes and hands me eight hundred words about it. I needed three things: did it work, what changed, and is there anything I have to decide. They are in there somewhere, and reading is the slowest thing I do all day.
+The left side is not hard to read because it is badly written. It is hard because most of your effort goes into matching a structure you already know (run, learning rate, status, loss) before you reach the values you came for. The right side hands that job to your eyes. Every math teacher knows this: a Venn diagram beats a paragraph of set notation. For structured information, our brains prefer pictures to prose.
 
-### For the agent, it is not efficient
+Machines have the same preference, for a different format:
 
-Before an agent can do what I asked, it has to find out what state the app is in. If the app only has a GUI, that means a screenshot, a model call to read it, a click, and another screenshot. If the app is a folder of code and data, it means reading files until it understands where things live. All of those tokens go into learning something the app already knows. The app just has no way to say it.
-
-Here is one real number. Everything my [Schedule Everything](https://github.com/AutoPhd-org/schedule-everything) workspace can show across its five pages (today's timeline, every task, every deadline, habits, history) comes out of one command as a JSON document of about 17 KB, roughly 5,000 tokens.{{< sidenote >}}Measured on my own data with `rmd state | wc -c`. The token count is an estimate at 3 to 4 bytes per token.{{< /sidenote >}} That is about the price of a few screenshots, each of which shows one screen of one page and still has to be read by a vision model that may misread it.
-
-So I keep coming back to two questions.
-
-> Who said people must convey information in words? And who said an agent must walk an app from its front to its back to read and change its state?
+> Code and JSON are how machines read structure. A GUI is how human eyes read structure. Today we force both sides into their worst format: people read and write prose, and agents squint at screenshots.
 {.pull}
 
-## Interface engineering
+My bet is that over the next few years, human efficiency on the user's side will matter as much as token efficiency on the agent's side, and that GUIs will become a new language for talking to agents. The more structured the information, the more a GUI will win over words. As a bonus, people who are not native speakers of the agent's best language will get a much better experience.
 
-Each stage of this story got its own kind of engineering. When the model was all there was, we worked on what we said to it: prompt engineering. When the limit became what the model had in front of it, we worked on that: context engineering. When the limit became the loop around the model, we built harnesses. I think the limit is now the place where the person, the agent and the software meet, and I call working on it **interface engineering**.
+{{< figure src="keystrokes.svg" dark="keystrokes-dark.svg" size="wide" alt="Two brags side by side. Today: my agent did it in 10 million tokens, drawn as a long stream of token marks. Next: I did it in 10 keystrokes, drawn as ten keycaps such as Tab, A and R." caption="Token efficiency is what we measure today. Your efficiency is what will matter." >}}
 
-It asks two things of any piece of software:
+Here is a view I find useful: **a GUI is a representation of structured information**, and in an agent's world, that information is the app's state. When you click a button or drag a card, you are not describing anything. You are changing the state directly. Which brings us to the second link.
 
-1. **How does the agent learn the app's state and change it?** The best answer is directly and in one step, without going through pixels.
-2. **How does the person tell the agent what they mean, and find out what it did?** The best answer is whichever way is quickest: a word, a click, a stroke of a pen, a key.
+## Bottleneck 2: agents are locked outside the GUI
 
-## Work that already points this way
+We already have plenty of GUI software, so why not just use it? Because in today's apps, only you can "speak" through the GUI. You click, and the state changes. The agent has no good way to speak back to you through the same surface, so it falls back on chat.
 
-I am far from the first to notice. Several projects already repair one of the arrows in the picture.
+To see why, look at how agents use GUI software today. A computer-use agent (CUA) does what you ask by operating the computer the way you would: it looks at the screen, moves the mouse, and types. Since [OSWorld](https://os-world.github.io/) gave the field a shared benchmark of real desktop tasks, CUAs have become much stronger, and they can now finish a wide range of them. But the way they work with a GUI doesn't make much sense to me, for two reasons.
 
-| Work | Which arrow it repairs | What is left |
-| --- | --- | --- |
-| Computer-use agents | None, on purpose. The agent uses the GUI as it is, so no app has to change. | It is the most expensive route there is: every step costs a screenshot and a model call. |
-| [CLI-Anything](https://github.com/HKUDS/CLI-Anything) | Agent to software. It reads an app's source code and generates a command-line harness with JSON output, so the agent runs commands and does not click. | It serves the agent only. Nothing changes for the person: there is no shared view, and no say over what the agent may see. |
-| [MCP](https://modelcontextprotocol.io/) and [WebMCP](https://github.com/webmachinelearning/webmcp) | Agent to software. An app, or a web page, declares the tools an agent may call. | The person is not in the picture. What the agent did comes back as text in a chat. |
-| [MCP Apps](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) | Agent to person. A tool can return an interactive widget that renders inside the conversation. | The widget lives in the chat. The app's own page, where the work really is, is somewhere else. |
-| [Intelligent UI](https://openai.com/index/gpt-6-for-everyone/) in ChatGPT, with GPT-6 | Agent to person, and a little of person to agent. The model composes its answer from charts, forms and tappable buttons as well as paragraphs. | The interface is made for one answer and stays in the chat. It is not the state of the apps you already use. |
+- **Pixel loops carry little information per step.** For most closed-source apps, the agent learns the app's state from screenshots. Even closing a popup means: take a high-resolution screenshot, have a model read it, click, and take another screenshot to check. Where an accessibility tree or a DOM is available, it describes how the screen is drawn, not the app's state, it is noisy, and many desktop apps expose too little of it, so the agent falls back to screenshots anyway. Unlike the output of a shell command, each screenshot says very little, so a task takes many of them. Closing a popup and adding one task to a to-do app takes at least four screenshots (about 5,000 image tokens) and four sequential calls to a vision model, each of which can misread the screen or click a few pixels off.{{< sidenote >}}Anthropic's vision docs estimate an image at about width × height / 750 tokens, so a 1280×720 screenshot is about 1,200 tokens. Models that read full-resolution screenshots can spend up to about 4,800 on one.{{< /sidenote >}} In my own task app, the same change is one command of about twenty tokens, `rmd add "Reply to reviewer 2" 8`. And if the agent needs to know everything first, one call, `rmd state`, returns all that the app's pages can show: about 34 KB of JSON, or roughly 10,000 tokens. That is the price of about eight screenshots, each of which would show one screen of one page.{{< sidenote >}}Measured on my own data with `rmd state | wc -c`. The token count is an estimate at 3 to 4 bytes per token.{{< /sidenote >}}
+- **GUIs have no `git diff` and no unit tests.** When an agent writes code, we check its work with tests, version control, and a diff we can read at a glance. When an agent works through a GUI, there is nothing like that. Part of the reason is that GUI tasks take many small steps, and asking you to approve each one would bury you. So you either trust thirty clicks you didn't watch, or you watch all thirty.
 
-OpenAI ends its announcement of Intelligent UI with a sentence I agree with: "Instead of people adapting to software, software will adapt to people." I would only aim it wider than the chat window, at the software itself.
+So, can we make GUI software agent-friendly? That means the agent needs only a few steps to act, and you can accept or reject the result at a glance. I think we can. The key is a bridge that lets the agent speak to the software directly, the way you do when you click. Then the UI responds to both of you.
 
-Taken together, these tell me the direction is right, and they also show the gap. Each one repairs a single arrow. None of them treats the app as the place where the person and the agent meet.
+The first piece of this runs today. In [Schedule Everything](https://github.com/AutoPhd-org/schedule-everything), my agent goes through my inbox and calendar for things I should do. It never adds a task by itself. It runs one command, and the suggestion appears on my task board, waiting for a yes or a no:
 
-## What I think software should look like
+{{< demo title="Same task, two routes" size="wide" caption="The right side is the real flow in Schedule Everything: the command is the one my agent runs, and the card is how a suggestion appears on my board. The left side is a typical computer-use loop, simplified." >}}
+<style>
+  .sr { display: grid; gap: 12px; }
+  .sr__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+  .sr__task { margin: 0; font-weight: 600; flex: 1 1 280px; }
+  .sr__go { font: 600 0.82rem/1 var(--font-sans); padding: 8px 14px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: var(--surface); cursor: pointer; }
+  .sr__cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+  .sr__col { display: grid; grid-template-rows: auto 1fr auto auto; gap: 8px; min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  .sr__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .sr__head strong { font: 700 0.75rem/1.2 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .sr__head span { font-size: 0.78rem; color: var(--faint); }
+  .sr__log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; align-content: start; min-height: 300px; font-size: 0.82rem; }
+  .sr__log li { display: grid; grid-template-columns: 46px 1fr; gap: 8px; align-items: baseline; animation: sr-in 0.25s ease-out; }
+  .sr__tag { font: 700 0.62rem/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 0; border-radius: 4px; text-align: center; }
+  .sr__tag--shot { color: var(--c-caution); background: var(--c-caution-bg); }
+  .sr__tag--look { color: var(--c-important); background: var(--c-important-bg); }
+  .sr__tag--act { color: var(--muted); background: var(--code-bg); }
+  .sr__meter { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 8px; }
+  .sr__meter b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .sr__you { margin: 0; font-size: 0.82rem; color: var(--text); }
+  .sr__right { display: grid; gap: 10px; align-content: start; min-height: 300px; }
+  .sr__cmd { margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--term-bg, #111317); color: #e6e3dc; font: 0.74rem/1.5 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; min-height: 6.2em; }
+  .sr__cmd .p { color: #8a877f; }
+  .sr__cmd .ok { color: #7fd1a3; }
+  .sr__card { display: grid; gap: 5px; padding: 10px 12px; border: 1.5px dashed var(--c-important); border-radius: 10px; background: var(--c-important-bg); animation: sr-in 0.3s ease-out; }
+  .sr__card[hidden] { display: none; }
+  .sr__by { font: 600 0.74rem/1.2 var(--font-sans); color: var(--c-important); }
+  .sr__card strong { font-size: 0.95rem; color: var(--text); }
+  .sr__why { font-size: 0.8rem; color: var(--muted); }
+  .sr__btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .sr__btns button { font: 600 0.8rem/1 var(--font-sans); padding: 8px 11px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; }
+  .sr__btns .sr__add { background: var(--c-tip); border-color: var(--c-tip); color: var(--surface); }
+  .sr__card.is-added { border-style: solid; border-color: var(--border); background: var(--bg); }
+  .sr__card.is-added .sr__by { color: var(--c-tip); }
+  .sr__card.is-rejected { opacity: 0.55; border-style: solid; border-color: var(--border); background: var(--bg); }
+  .sr__card.is-rejected .sr__by { color: var(--muted); }
+  .sr__card.is-rejected strong { text-decoration: line-through; }
+  .sr__undo { justify-self: start; font: 600 0.78rem/1 var(--font-sans); padding: 0; border: 0; background: none; color: var(--accent); text-decoration: underline; cursor: pointer; }
+  @keyframes sr-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 720px) { .sr__cols { grid-template-columns: minmax(0, 1fr); } .sr__log, .sr__right { min-height: 0; } }
+  @media (prefers-reduced-motion: reduce) { .sr__log li, .sr__card { animation: none; } }
+</style>
+<div class="sr" data-sr>
+  <div class="sr__top">
+    <p class="sr__task">An email from reviewer 2 means you have one more thing to do. Your agent puts it on your task list.</p>
+    <button class="sr__go" type="button" data-sr-go>Run both</button>
+  </div>
+  <div class="sr__cols">
+    <div class="sr__col">
+      <div class="sr__head"><strong>Through the GUI</strong><span>computer-use loop</span></div>
+      <ol class="sr__log" data-sr-log aria-live="polite"></ol>
+      <div class="sr__meter"><span><b data-sr-shots>0</b> screenshots</span><span><b data-sr-calls>0</b> vision calls</span><span>~<b data-sr-tok>0</b> image tokens</span></div>
+      <p class="sr__you">To check its work, you replay every step.</p>
+    </div>
+    <div class="sr__col">
+      <div class="sr__head"><strong>Through the app's state</strong><span>Schedule Everything</span></div>
+      <div class="sr__right">
+        <pre class="sr__cmd" data-sr-cmd aria-live="polite"></pre>
+        <div class="sr__card" data-sr-card hidden>
+          <span class="sr__by" data-sr-by>✦ suggested by Claude · from Gmail</span>
+          <strong>Reply to reviewer 2</strong>
+          <span class="sr__why" data-sr-why>Reviewer 2 asked for one more ablation.</span>
+          <div class="sr__btns" data-sr-btns>
+            <button type="button" class="sr__add" data-sr-add>✓ Add to my tasks</button>
+            <button type="button" data-sr-rej>✕ Reject</button>
+          </div>
+          <button type="button" class="sr__undo" data-sr-undo hidden>undo</button>
+        </div>
+      </div>
+      <div class="sr__meter"><span><b data-sr-cmds>0</b> command</span><span><b>0</b> screenshots</span><span>~<b data-sr-ctok>0</b> tokens</span></div>
+      <p class="sr__you">To check its work, you click once.</p>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.querySelector('[data-sr]');
+  if (!root) return;
+  var $ = function (s) { return root.querySelector(s); };
+  var log = $('[data-sr-log]'), cmd = $('[data-sr-cmd]'), card = $('[data-sr-card]');
+  var steps = [
+    ['shot', 'Screenshot the screen (1280×720)'],
+    ['look', 'A “What’s new” popup covers the board'],
+    ['act', 'Click × at (912, 164)'],
+    ['shot', 'Screenshot'],
+    ['look', 'Find the “New task” button'],
+    ['act', 'Click (1046, 132)'],
+    ['shot', 'Screenshot'],
+    ['look', 'Find the title field and the priority menu'],
+    ['act', 'Type “Reply to reviewer 2”'],
+    ['act', 'Priority menu → 8, then click Save'],
+    ['shot', 'Screenshot to check the result'],
+    ['look', 'The task is on the board. Done.']
+  ];
+  var command = '<span class="p">$</span> rmd suggest add "Reply to reviewer 2" 8 \\\n    --source Gmail --agent Claude \\\n    --reason "Reviewer 2 asked for one more ablation."';
+  var timers = [];
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function later(fn, ms) { timers.push(setTimeout(fn, reduce ? 0 : ms)); }
+  function setText(sel, v) { $(sel).textContent = v; }
+  function resetCard() {
+    card.className = 'sr__card';
+    card.hidden = true;
+    $('[data-sr-by]').textContent = '✦ suggested by Claude · from Gmail';
+    $('[data-sr-btns]').hidden = false;
+    $('[data-sr-undo]').hidden = true;
+  }
+  function run() {
+    timers.forEach(clearTimeout); timers = [];
+    log.innerHTML = ''; cmd.innerHTML = ''; resetCard();
+    ['[data-sr-shots]', '[data-sr-calls]', '[data-sr-tok]', '[data-sr-cmds]', '[data-sr-ctok]'].forEach(function (s) { setText(s, '0'); });
+    var shots = 0, calls = 0;
+    steps.forEach(function (s, i) {
+      later(function () {
+        var li = document.createElement('li');
+        li.innerHTML = '<span class="sr__tag sr__tag--' + s[0] + '">' + s[0] + '</span><span></span>';
+        li.lastChild.textContent = s[1];
+        log.appendChild(li);
+        if (s[0] === 'shot') shots++;
+        if (s[0] === 'look') calls++;
+        setText('[data-sr-shots]', shots);
+        setText('[data-sr-calls]', calls);
+        setText('[data-sr-tok]', (shots * 1200).toLocaleString('en-US'));
+      }, 300 + i * 520);
+    });
+    later(function () { cmd.innerHTML = command; setText('[data-sr-cmds]', '1'); setText('[data-sr-ctok]', '40'); }, 300);
+    later(function () { cmd.innerHTML = command + '\n<span class="ok">Suggested. It waits on the task board.</span>'; }, 800);
+    later(function () { card.hidden = false; }, 1000);
+  }
+  $('[data-sr-add]').addEventListener('click', function () {
+    card.className = 'sr__card is-added';
+    $('[data-sr-by]').textContent = '✓ on your task list · importance 8';
+    $('[data-sr-btns]').hidden = true; $('[data-sr-undo]').hidden = false;
+  });
+  $('[data-sr-rej]').addEventListener('click', function () {
+    card.className = 'sr__card is-rejected';
+    $('[data-sr-by]').textContent = 'Rejected. Your agent won’t suggest it again.';
+    $('[data-sr-btns]').hidden = true; $('[data-sr-undo]').hidden = false;
+  });
+  $('[data-sr-undo]').addEventListener('click', function () { resetCard(); card.hidden = false; });
+  $('[data-sr-go]').addEventListener('click', function () { this.textContent = 'Run again'; run(); });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { io.disconnect(); $('[data-sr-go]').textContent = 'Run again'; run(); }
+    }, { threshold: 0.5 });
+    io.observe(root);
+  } else { run(); }
+})();
+</script>
+{{< /demo >}}
 
-Two changes, and both are changes to the app, not to the model.
+The same idea works anywhere the *where* and the *what* are easier to show than to say. Here is a mock-up of a slide tool that takes its instructions from your cursor and a key:
 
-### 1. The agent works on the app's state, with your authorization
+{{< demo title="Point, press, accept" caption="A mock-up, not a product yet. Where you click says *where*. The key says *what*. <kbd>Tab</kbd> or <kbd>Esc</kbd> says *yes* or *no*. Words are left for the parts only words can say." >}}
+<style>
+  .sl { display: grid; gap: 12px; }
+  .sl__task { margin: 0; font-size: 0.92rem; }
+  .sl__task kbd, .sl__keys kbd { font: 600 0.78rem/1 var(--font-mono); padding: 2px 6px; border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); color: var(--text); }
+  .sl__stage { position: relative; border-radius: 10px; outline: none; }
+  .sl__stage:focus-visible { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 1px var(--accent); }
+  .sl__slide { position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--border-strong); border-radius: 10px; background: #ffffff; color: #1b1a18; overflow: hidden; cursor: text; container-type: inline-size; }
+  .sl__title { position: absolute; left: 6%; top: 8%; margin: 0; font: 800 5.4cqw/1.1 var(--font-sans); color: #23508e; letter-spacing: -0.02em; }
+  .sl__text { position: absolute; left: 6%; top: 30%; width: 40%; margin: 0; padding-left: 1.1em; font: 500 2.7cqw/1.6 var(--font-sans); }
+  .sl__caret { position: absolute; width: 2px; height: 7%; margin-top: -3.5%; background: #6a45c0; animation: sl-blink 1s steps(1) infinite; pointer-events: none; }
+  .sl__caret[hidden] { display: none; }
+  .sl__item { position: absolute; box-sizing: border-box; padding: 1.2%; border-radius: 6px; }
+  .sl__item svg { display: block; width: 100%; height: 100%; }
+  .sl__item ul { margin: 0; padding-left: 1.1em; font: 500 2.3cqw/1.55 var(--font-sans); }
+  .sl__ghost { border: 2px dashed #6a45c0; background: rgba(106, 69, 192, 0.07); }
+  .sl__ghost::after { content: "Tab keeps · Esc discards"; position: absolute; left: 0; bottom: 100%; margin-bottom: 4px; font: 700 1.6cqw/1 var(--font-sans); color: #6a45c0; white-space: nowrap; }
+  .sl__hint { position: absolute; inset: auto 0 4% 0; text-align: center; font: 500 2cqw/1 var(--font-sans); color: #99948a; pointer-events: none; }
+  .sl__keys { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sl__keys button { display: inline-flex; align-items: center; gap: 6px; font: 600 0.8rem/1 var(--font-sans); padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; }
+  .sl__keys button:disabled { opacity: 0.45; cursor: default; }
+  .sl__cmp { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 12px; }
+  .sl__box { display: grid; gap: 6px; align-content: start; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font-size: 0.85rem; }
+  .sl__box strong { font: 700 0.72rem/1.2 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .sl__box b { font-variant-numeric: tabular-nums; }
+  .sl__prompt { margin: 0; padding: 8px 10px; border-radius: 8px; background: var(--code-bg); font: 0.78rem/1.5 var(--font-mono); white-space: pre-wrap; }
+  .sl__muted { color: var(--muted); }
+  @keyframes sl-blink { 50% { opacity: 0; } }
+  @media (max-width: 640px) { .sl__cmp { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .sl__caret { animation: none; } }
+</style>
+<div class="sl" data-sl>
+  <p class="sl__task">Click anywhere on the slide, then press <kbd>C</kbd> for a chart, <kbd>B</kbd> for bullets or <kbd>D</kbd> for a diagram. <kbd>Tab</kbd> keeps the suggestion, <kbd>Esc</kbd> throws it away.</p>
+  <div class="sl__stage" tabindex="0" data-sl-stage role="application" aria-label="Slide. Click to place the cursor, then press C, B or D. Tab keeps the suggestion and Escape discards it.">
+    <div class="sl__slide" data-sl-slide>
+      <div class="sl__title">Q3: what changed</div>
+      <ul class="sl__text"><li>p95 latency down 38%</li><li>Two new regions live</li><li>Churn flat at 2.1%</li></ul>
+      <span class="sl__caret" data-sl-caret hidden></span>
+      <span class="sl__hint" data-sl-hint>click the empty space on the right</span>
+    </div>
+  </div>
+  <div class="sl__keys" data-sl-keys>
+    <button type="button" data-key="c"><kbd>C</kbd> chart</button>
+    <button type="button" data-key="b"><kbd>B</kbd> bullets</button>
+    <button type="button" data-key="d"><kbd>D</kbd> diagram</button>
+    <button type="button" data-key="tab"><kbd>Tab</kbd> keep</button>
+    <button type="button" data-key="esc"><kbd>Esc</kbd> discard</button>
+  </div>
+  <div class="sl__cmp">
+    <div class="sl__box"><strong>What you did</strong><span><b data-sl-clicks>0</b> clicks and <b data-sl-presses>0</b> keys.</span></div>
+    <div class="sl__box"><strong>The prompt you would write instead</strong><p class="sl__prompt" data-sl-prompt>Add a small bar chart of the quarterly latency numbers in the empty space on the right side of this slide, below the title, about as tall as the bullet list, in the same blue as the title. Don't move anything else.</p><span class="sl__muted"><b data-sl-chars>0</b> characters, and then you still check where it went.</span></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.querySelector('[data-sl]');
+  if (!root) return;
+  var stage = root.querySelector('[data-sl-stage]');
+  var slide = root.querySelector('[data-sl-slide]');
+  var caret = root.querySelector('[data-sl-caret]');
+  var hint = root.querySelector('[data-sl-hint]');
+  var pos = null, ghost = null, clicks = 0, presses = 0;
+  root.querySelector('[data-sl-chars]').textContent = root.querySelector('[data-sl-prompt]').textContent.length;
+  var W = 38, H = 46;
+  var make = {
+    c: function () {
+      var h = [62, 48, 38, 30], bars = '';
+      ['Q4', 'Q1', 'Q2', 'Q3'].forEach(function (q, i) { var v = h[i]; bars += '<rect x="' + (10 + i * 24) + '" y="' + (86 - v) + '" width="16" height="' + v + '" rx="2" fill="#23508e" opacity="' + (0.45 + i * 0.18).toFixed(2) + '"/><text x="' + (18 + i * 24) + '" y="96" font-size="7" text-anchor="middle" fill="#6b675f">' + q + '</text>'; });
+      return '<svg viewBox="0 0 110 100" preserveAspectRatio="xMidYMid meet" aria-label="Bar chart of p95 latency by quarter"><text x="4" y="10" font-size="7.5" font-weight="700" fill="#1b1a18">p95 latency (ms)</text><path d="M6 86 H106" stroke="#d3cec2"/>' + bars + '</svg>';
+    },
+    b: function () { return '<ul><li>Cache moved to the edge</li><li>EU and APAC regions</li><li>Next: cut cold starts</li></ul>'; },
+    d: function () {
+      var box = function (x, t) { return '<rect x="' + x + '" y="38" width="30" height="24" rx="4" fill="#f3effb" stroke="#6a45c0"/><text x="' + (x + 15) + '" y="53" font-size="7" text-anchor="middle" fill="#1b1a18">' + t + '</text>'; };
+      var arrow = function (x) { return '<path d="M' + x + ' 50 h8" stroke="#99948a" stroke-width="1.5" marker-end="url(#sl-ah)"/>'; };
+      return '<svg viewBox="0 0 110 100" preserveAspectRatio="xMidYMid meet" aria-label="Diagram: request, edge cache, region"><defs><marker id="sl-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#99948a"/></marker></defs>' + box(2, 'request') + arrow(33) + box(41, 'edge') + arrow(72) + box(80, 'region') + '</svg>';
+    }
+  };
+  function count() {
+    root.querySelector('[data-sl-clicks]').textContent = clicks;
+    root.querySelector('[data-sl-presses]').textContent = presses;
+  }
+  function place(kind) {
+    if (!pos) { pos = { x: 55, y: 32 }; showCaret(); }
+    if (ghost) ghost.remove();
+    ghost = document.createElement('div');
+    ghost.className = 'sl__item sl__ghost';
+    var x = Math.min(Math.max(pos.x, 2), 98 - W), y = Math.min(Math.max(pos.y, 10), 96 - H);
+    ghost.style.left = x + '%'; ghost.style.top = y + '%';
+    ghost.style.width = W + '%'; ghost.style.height = H + '%';
+    ghost.innerHTML = make[kind]();
+    slide.appendChild(ghost);
+    caret.hidden = true;
+  }
+  function keep() { if (!ghost) return false; ghost.classList.remove('sl__ghost'); ghost = null; pos = null; return true; }
+  function discard() { if (!ghost) return false; ghost.remove(); ghost = null; if (pos) caret.hidden = false; return true; }
+  function showCaret() { caret.style.left = pos.x + '%'; caret.style.top = pos.y + '%'; caret.hidden = false; }
+  function act(k) {
+    if (k === 'tab') return keep();
+    if (k === 'esc') return discard();
+    if (make[k]) { place(k); return true; }
+    return false;
+  }
+  slide.addEventListener('click', function (e) {
+    var r = slide.getBoundingClientRect();
+    pos = { x: (e.clientX - r.left) / r.width * 100, y: (e.clientY - r.top) / r.height * 100 };
+    if (ghost) { ghost.remove(); ghost = null; }
+    showCaret(); hint.hidden = true;
+    clicks++; count(); stage.focus({ preventScroll: true });
+  });
+  stage.addEventListener('keydown', function (e) {
+    var k = e.key === 'Tab' ? 'tab' : e.key === 'Escape' ? 'esc' : e.key.toLowerCase();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (act(k)) { e.preventDefault(); presses++; count(); hint.hidden = true; }
+  });
+  root.querySelectorAll('[data-sl-keys] button').forEach(function (b) {
+    b.addEventListener('click', function () { if (act(b.dataset.key)) { presses++; count(); hint.hidden = true; } });
+  });
+  count();
+})();
+</script>
+{{< /demo >}}
 
-{{< figure src="direct-state.svg" dark="direct-state-dark.svg" size="wide" alt="An app has one state document and a page that is one view of it. You use the page. Your agent reads the state and runs commands directly, through access switches you set for each part of the state: whether it can see it, and whether it may act, must ask first, or may not act. The route agents take today, through screenshots and clicks on the page, is drawn as a long detour." caption="The page is one view of the state. The agent reads the same state through switches you set, and no longer has to go through the page." >}}
+There is an obvious limitation. In the slide example, how does the agent know what <kbd>C</kbd> or <kbd>B</kbd> means? Before you can work this way, the software has to be set up, and setting it up still takes natural language. But it is a lot like writing reusable skills for an agent: you describe a pattern once, and after that a key stands for it. The more of these we build, the fewer words we spend on the parts that never change.
 
-An app keeps its whole state in one document and offers one command per action. The page I look at is a view of that document and has no private channel, so nothing exists only on screen. The agent reads the same document in one call, and when it acts, the page in front of me changes at once.
+## Where this leaves us
 
-I stay in charge of how far it reaches. For each part of the state I decide whether the agent can see it, and whether it may act, has to ask first, or may not touch it. It is the same kind of decision as camera and location permissions on a phone, and it should be just as easy to find.
+With agents improving this fast, the bottleneck is now how we communicate with them, at both ends. People love to click and press <kbd>Tab</kbd>, yet we write long prompts and read long answers. Agents love to write code and call tools, yet they take screenshots and go the visual way. Each side is stuck working in the other's format.
 
-The first half already exists. It is the contract behind [LaunchX](https://github.com/AutoPhd-org/launchx), the launcher I use for my local apps: an app serves its state at one address and ships a CLI that can do everything its page can, and LaunchX has a switch per app for whether my agents are told about it.
-
-{{< terminal title="~ · zsh" >}}
-$ lx agents
-Apps that agents can discover:
-
-ID   NAME                 STATUS   CLI  SKILLS
-rmd  Schedule Everything  running  rmd  build-schedule, plan-day, suggest-tasks
-vmc  Machine Console      running  vmc  —
-
-Agents find them through the `launchx` skill in ~/.claude/skills and ~/.agents/skills.
-$ rmd state | wc -c
-17177
-{{< /terminal >}}
-
-> [!NOTE] What the switch does today
-> The LaunchX switch is per app, and it decides what agents are *told about*, not what they can reach. Switches for each part of an app, with real enforcement behind them, are the next thing to build. The figure shows where this is heading.
-
-### 2. You and the agent share one interface
-
-{{< figure src="shared-interface.svg" dark="shared-interface-dark.svg" size="wide" alt="One app window that you and your agent both use. On a task board, a task the agent suggested has Add and Reject buttons, a task you circled with a pen carries your handwritten note, and a task the agent just added can be undone. A bar lists shortcut keys. A side panel has switches for what the agent can see and do in each part of the app, and the chat box is still there." caption="One page for both of you. Five ways to answer, and the chat box is only one of them." >}}
-
-The second change is where the conversation happens. The agent no longer describes the app to me in a chat window. We both work on the app's own page: what it does shows up there, and what I do, it can see.
-
-Once we share a surface, I can answer in whichever way is quickest:
-
-- **Words.** The chat box stays. "Plan my afternoon" is best said as a sentence.
-- **Yes / no buttons.** Most of my replies to an agent are yes or no, and a button beats typing "yes, go ahead".
-- **A pen.** Circle the thing and write "split this in two" next to it. The stroke lands on an object in the app's state, so the agent knows which task I mean without my describing it.
-- **Shortcut keys.** <kbd>A</kbd> to add, <kbd>R</kbd> to reject, <kbd>Z</kbd> to undo what the agent just did.
-- **Switches.** The access panel from the first picture, on the page, where I can find it.
-
-Part of this runs today too. In Schedule Everything, when my agent goes through my inbox and calendar for things I should do, it never adds a task itself. Its suggestions appear on my task board, dashed and labelled with who suggested them and why, each with two buttons: **Add to my tasks** and **Reject**. That is a yes/no button on a shared page, and it replaced a paragraph of chat. I wrote about the rest of that app in [the previous post](/p/time-management/). The pen and the shortcut keys are not built yet.
-
-## What this is not
-
-At [AutoPhD](https://github.com/AutoPhd-org) we do not make better models, and we do not make better harnesses. Both are improving quickly without us, and an app built this way should work with whichever harness you use next year.
-
-All we try to do is build the best interface for each scene of daily life and work where a person and an agent meet: one where they understand each other easily, and the agent gets the job done for less. We start with the scenes I live in as a PhD student: planning a week, reading papers, keeping an eye on GPU servers.
-
-## Three years
-
-So what should software look like three years from now? These are my bets.
-
-1. **Apps ship their state.** A state document and a list of commands become as ordinary as a mobile layout is today. An app without them will feel like a website that does not work on a phone.
-2. **Agent access is a settings page.** What an agent can see and do in an app is a panel of switches you can find in ten seconds.
-3. **The chat box is one control among several.** It sits beside buttons, pens and keys, on the app's own page.
-4. **The GUI does not go away.** It becomes the place where you and your agent meet.
-
-If I am right, what decides whether software does well in the next three years is how easily a person and an agent can use it together, more than how smart the model inside it is.
-
-The code so far is at [AutoPhD](https://github.com/AutoPhd-org): [LaunchX](https://github.com/AutoPhd-org/launchx) with its [contract](https://github.com/AutoPhd-org/launchx/blob/main/SPEC.md), and [Schedule Everything](https://github.com/AutoPhd-org/schedule-everything). If you build an app this way, or think I have this wrong, open an issue there. I would like to hear it.
+In Part 2, I will go through practical ways to cut the friction at both links: what existing work such as MCP, generative UI and CLI wrappers already fixes and what it leaves open, some new ideas, and the proof of concept I built around them. That is [LaunchX](https://github.com/AutoPhd-org/launchx), a launcher whose apps hand their state straight to your agents, together with [Schedule Everything](https://github.com/AutoPhd-org/schedule-everything), the app from the demo above.
